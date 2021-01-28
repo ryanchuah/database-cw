@@ -1,0 +1,7 @@
+# ryan: a folder i use for personal reference files
+tutorial/
+
+#bytecode
+*.pyc  
+
+__pycache__/
