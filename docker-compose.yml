@@ -1,7 +1,9 @@
 version: '3.9'
 services:
   server:
-    build: ./server
+    build: 
+      context: ./server
+      dockerfile: server.Dockerfile
     links:
       - db
     ports:
