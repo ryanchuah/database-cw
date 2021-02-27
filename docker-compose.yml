@@ -1,13 +1,16 @@
 version: '3.9'
+
 services:
   server:
-    build: 
-      context: ./server
-      dockerfile: server.Dockerfile
-    links:
-      - db
-    ports:
-      - "5000:5000"
+      build: 
+        context: ./server
+        dockerfile: server.Dockerfile
+      volumes: 
+        - ./server:/usr/src/app
+      links:
+        - db
+      ports:
+        - "5000:5000"
 
   db:
     build: 

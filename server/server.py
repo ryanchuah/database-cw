@@ -32,10 +32,10 @@ def favorite_colors() -> List[Dict]:
 
     return results
 
-@app.route("/sammy")
+@app.route("/")
 @cross_origin()
 def index():
-  return json.dumps({'favorite_colors': favorite_colors()})
+    return json.dumps({'favourite_color': favorite_colors()})
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0', port=5000, debug=True)
