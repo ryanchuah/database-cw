@@ -10,3 +10,6 @@ client.Dockerfile
 
 # any files starting with "temp"
 temp*
+
+# .idea
+.idea/
