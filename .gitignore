@@ -144,3 +144,5 @@ cython_debug/
 
 # any files starting with "temp"
 temp*
+
+venv

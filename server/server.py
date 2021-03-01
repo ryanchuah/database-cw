@@ -24,10 +24,11 @@ def movies() -> List[Dict]:
         'port': '3306',
         'database': 'movies_db'
     }
+    results = None
     try:
         connection = mysql.connector.connect(**config)
         cursor = connection.cursor()
-        cursor.execute("SELECT * FROM Movies_table")
+        cursor.execute("SELECT * FROM Movies")
         results = []
         for movieId, movieTitle, imdbId, tmdbId in cursor:
             results.append((movieId, movieTitle, imdbId, tmdbId))
@@ -45,8 +46,8 @@ def movies() -> List[Dict]:
 
     # connection = mysql.connector.connect(**config)
     # cursor = connection.cursor()
-    # cursor.execute('SELECT * FROM Movies_table')
-    # results = [{movieId: title} for (movieId, title) in cursor]
+    # cursor.execute('SELECT * FROM Movies')
+    # results = [{movieId: title} for (movieId, title, _, _) in cursor]
     # cursor.close()
     # connection.close()
 

@@ -20,7 +20,7 @@ CREATE TABLE Genres (
   movieId INT not null,
   genre VARCHAR(20) not null,
   PRIMARY KEY (movieId, genre),
-  FOREIGN KEY (movieId) REFERENCES Movies_table(movieId)
+  FOREIGN KEY (movieId) REFERENCES Movies(movieId)
 );
 
 LOAD DATA INFILE '/var/lib/mysql-files/datasets/Genres.csv'
@@ -35,7 +35,7 @@ CREATE TABLE Ratings (
   movieId INT not null,
   rating FLOAT not null,
   PRIMARY KEY (movieId, userID),
-  FOREIGN KEY (movieId) REFERENCES Movies_table(movieId)
+  FOREIGN KEY (movieId) REFERENCES Movies(movieId)
 );
 
 LOAD DATA INFILE '/var/lib/mysql-files/datasets/Ratings.csv'
@@ -47,11 +47,11 @@ IGNORE 1 LINES;
 
 CREATE TABLE Tags (
   tagId INT not null,
-  movieId INT not null,
   userId INT not null,
-  tag VARCHAR(20) not null,
+  movieId INT not null,
+  tag VARCHAR(100) not null,
   PRIMARY KEY (tagId),
-  FOREIGN KEY (movieId) REFERENCES Movies_table(movieId)
+  FOREIGN KEY (movieId) REFERENCES Movies(movieId)
 );
 
 LOAD DATA INFILE '/var/lib/mysql-files/datasets/Tags.csv'
