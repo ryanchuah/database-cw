@@ -10,6 +10,7 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 from typing import List, Dict
 from flask import Flask
 import mysql.connector
+from mysql.connector import errorcode
 import json
 
 app = Flask(__name__)
@@ -23,12 +24,31 @@ def movies() -> List[Dict]:
         'port': '3306',
         'database': 'movies_db'
     }
-    connection = mysql.connector.connect(**config)
-    cursor = connection.cursor()
-    cursor.execute('SELECT * FROM Movies_table')
-    results = [{movieId: title} for (movieId, title) in cursor]
-    cursor.close()
-    connection.close()
+    try:
+        connection = mysql.connector.connect(**config)
+        cursor = connection.cursor()
+        cursor.execute("SELECT * FROM Movies_table")
+        results = []
+        for movieId, movieTitle, imdbId, tmdbId in cursor:
+            results.append((movieId, movieTitle, imdbId, tmdbId))
+        cursor.close()
+        return results
+    except mysql.connector.Error as err:
+        if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+            print("Something is wrong with your user name or password")
+        elif err.errno == errorcode.ER_BAD_DB_ERROR:
+            print("Database does not exist")
+        else:
+            print(err)
+    finally:
+        connection.close()
+
+    # connection = mysql.connector.connect(**config)
+    # cursor = connection.cursor()
+    # cursor.execute('SELECT * FROM Movies_table')
+    # results = [{movieId: title} for (movieId, title) in cursor]
+    # cursor.close()
+    # connection.close()
 
     return results
 

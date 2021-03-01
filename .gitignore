@@ -7,3 +7,6 @@ tutorial/
 __pycache__/
 
 client.Dockerfile
+
+# any files starting with "temp"
+temp*
