@@ -30,12 +30,28 @@ ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
 IGNORE 1 LINES;
 
+
+CREATE TABLE Users (
+  userId INT not null,
+  PRIMARY KEY (userId)
+);
+
+LOAD DATA INFILE '/var/lib/mysql-files/datasets/Users.csv'
+INTO TABLE Users
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES;
+
+
 CREATE TABLE Ratings (
   userId INT not null,
   movieId INT not null,
   rating FLOAT not null,
-  PRIMARY KEY (movieId, userID),
-  FOREIGN KEY (movieId) REFERENCES Movies(movieId)
+  timestamp DATETIME not null,
+  PRIMARY KEY (movieId, userID, timestamp),
+  FOREIGN KEY (movieId) REFERENCES Movies(movieId),
+  FOREIGN KEY (userId) REFERENCES Users(userId)
 );
 
 LOAD DATA INFILE '/var/lib/mysql-files/datasets/Ratings.csv'
@@ -46,12 +62,13 @@ LINES TERMINATED BY '\n'
 IGNORE 1 LINES;
 
 CREATE TABLE Tags (
-  tagId INT not null,
   userId INT not null,
   movieId INT not null,
   tag VARCHAR(100) not null,
-  PRIMARY KEY (tagId),
-  FOREIGN KEY (movieId) REFERENCES Movies(movieId)
+  timestamp DATETIME not null,
+  PRIMARY KEY (userId, movieId, tag),
+  FOREIGN KEY (movieId) REFERENCES Movies(movieId),
+  FOREIGN KEY (userId) REFERENCES Users(userId)
 );
 
 LOAD DATA INFILE '/var/lib/mysql-files/datasets/Tags.csv'
@@ -60,3 +77,4 @@ FIELDS TERMINATED BY ','
 ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
 IGNORE 1 LINES;
+
