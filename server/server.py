@@ -54,11 +54,10 @@ def index():
         else:
             query = ("SELECT * FROM Movies LIMIT %s")
             cursor.execute(query, (limit,))
-
         movies = []
-        for movieId, movieTitle, imdbId, tmdbId in cursor:
-            movies.append({'movieId': movieId, 'movieTitle': movieTitle,
-                           'imdbId': imdbId, 'tmdbId': tmdbId})
+        for movie in cursor:
+            movies.append({'movieId': movie[0], 'movieTitle': movie[1],
+                           'imdbId': movie[2], 'tmdbId': movie[3]})
         cursor.close()
         return {"movies": movies}
     except mysql.connector.Error as err:
@@ -71,24 +70,24 @@ def index():
     finally:
         cursor.close()
         connection.close()
-    return results
 
 
-def popular(start, end)-> List[Dict]:
+def popular(start, end) -> List[Dict]:
     result = []
     try:
         connection = mysql.connector.connect(**config)
         cursor = connection.cursor()
         nRows = end - start + 1
-        command = "SELECT Movies.title, Movies.release_year, Sum(Ratings.rating) as total_ratings, Count(Ratings.rating) as votes, Avg(Ratings.rating) as avg_ratings FROM Ratings, Movies WHERE Ratings.movieId = Movies.movieId GROUP BY Ratings.movieId ORDER BY total_ratings DESC LIMIT " + str(nRows) + " OFFSET " + str(start - 1)
+        command = "SELECT Movies.title, Movies.release_year, Sum(Ratings.rating) as total_ratings, Count(Ratings.rating) as votes, Avg(Ratings.rating) as avg_ratings FROM Ratings, Movies WHERE Ratings.movieId = Movies.movieId GROUP BY Ratings.movieId ORDER BY total_ratings DESC LIMIT " + str(
+            nRows) + " OFFSET " + str(start - 1)
         cursor.execute(command)
-        result = [{"title" : title, "release_year" : release_year, "votes": votes, "avg_ratings":avg_ratings} 
-                   for title, release_year, total_ratings, votes, avg_ratings in cursor]
+        result = [{"title": title, "release_year": release_year, "votes": votes, "avg_ratings": avg_ratings}
+                  for title, release_year, total_ratings, votes, avg_ratings in cursor]
     except mysql.connector.Error as err:
         if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
             abort(500, "Something is wrong with your user name or password")
         elif err.errno == errorcode.ER_BAD_DB_ERROR:
-            abort(500  ,"Database does not exist")
+            abort(500, "Database does not exist")
         else:
             abort(500, err)
     finally:
@@ -105,11 +104,13 @@ def getMostPopular():
     try:
         start = int(request.args.get('popularity_start'))
         end = int(request.args.get('popularity_end'))
-        if start < 1 or end < 1 or start > end: abort(400)
-        return json.dumps({'most_popular' : popular(start, end)})
+        if start < 1 or end < 1 or start > end:
+            abort(400)
+        return json.dumps({'most_popular': popular(start, end)})
     except ValueError as e:
-            abort(400, e)
+        abort(400, e)
     return 'Something went wrong'
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
