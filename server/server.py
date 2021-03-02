@@ -57,7 +57,8 @@ def index():
 
         movies = []
         for movieId, movieTitle, imdbId, tmdbId in cursor:
-            movies.append((movieId, movieTitle, imdbId, tmdbId))
+            movies.append({'movieId': movieId, 'movieTitle': movieTitle,
+                           'imdbId': imdbId, 'tmdbId': tmdbId})
         cursor.close()
         return {"movies": movies}
     except mysql.connector.Error as err:
