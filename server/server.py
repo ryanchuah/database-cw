@@ -30,8 +30,8 @@ def movies() -> List[Dict]:
         cursor = connection.cursor()
         cursor.execute("SELECT * FROM Movies")
         results = []
-        for movieId, movieTitle, imdbId, tmdbId in cursor:
-            results.append((movieId, movieTitle, imdbId, tmdbId))
+        for movieId, movieTitle, year, imdbId, tmdbId in cursor:
+            results.append((movieId, movieTitle, year, imdbId, tmdbId))
         cursor.close()
         return results
     except mysql.connector.Error as err:

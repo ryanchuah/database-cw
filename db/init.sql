@@ -6,6 +6,7 @@ CREATE TABLE Movies (
   title VARCHAR(200) not null,
   imdbId INT default -1,
   tmdbId INT default -1,
+  release_year INT default -1,
   PRIMARY KEY (movieId)
 );
 
