@@ -145,4 +145,14 @@ cython_debug/
 # any files starting with "temp"
 temp*
 
-venv
+# lockfiles
+.~lock*
+
+# vscode settings
+.vscode/
+
+# Ryan's tutorial
+tutorial/
+
+# client Dockerfile
+client.Dockerfile
