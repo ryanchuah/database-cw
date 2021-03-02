@@ -3,7 +3,7 @@ from mysql.connector import errorcode
 import mysql.connector
 from flask import Flask
 from typing import List, Dict
-from flask import Flask, request
+from flask import Flask, request, abort
 from flask_cors import CORS, cross_origin
 app = Flask(__name__)
 
@@ -12,31 +12,6 @@ app = Flask(__name__)
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
-<<<<<<< HEAD
-from typing import List, Dict
-from flask import Flask, abort
-import mysql.connector
-from mysql.connector import errorcode
-import json
-
-app = Flask(__name__)
-config = {
-        'user': 'root',
-        'password': 'root',
-        'host': 'db',
-        'port': '3306',
-        'database': 'movies_db'
-    }
-
-def movies() -> List[Dict]:
-    results = []
-    try:
-        connection = mysql.connector.connect(**config)
-        cursor = connection.cursor()
-        cursor.execute("SELECT * FROM Movies")
-        for movieId, movieTitle, year, imdbId, tmdbId in cursor:
-            results.append((movieId, movieTitle, year, imdbId, tmdbId))
-=======
 
 app = Flask(__name__)
 
@@ -84,7 +59,6 @@ def index():
         for movieId, movieTitle, imdbId, tmdbId in cursor:
             movies.append({'movieId': movieId, 'movieTitle': movieTitle,
                            'imdbId': imdbId, 'tmdbId': tmdbId})
->>>>>>> f2098243085cb16b5a885e6aaad99bf1a63bd42a
         cursor.close()
         return {"movies": movies}
     except mysql.connector.Error as err:
@@ -99,19 +73,13 @@ def index():
         connection.close()
     return results
 
+
 def popular(start, end)-> List[Dict]:
     result = []
     try:
         connection = mysql.connector.connect(**config)
         cursor = connection.cursor()
         nRows = end - start + 1
-        # command = "SELECT movies.title, movies.release_year, "
-        # "Sum(rating) as total_ratings, Count(rating) as votes, Avg(rating) as avg_ratings" 
-        # "FROM ratings, movies"
-        # "WHERE ratings.movieId = movies.movieId" 
-        # "GROUP BY ratings.movieId"
-        # "ORDER BY total_ratings DESC"
-        # "LIMIT" + str(nRows) + "OFFSET" + str(start - 1) + ";"
         command = "SELECT Movies.title, Movies.release_year, Sum(Ratings.rating) as total_ratings, Count(Ratings.rating) as votes, Avg(Ratings.rating) as avg_ratings FROM Ratings, Movies WHERE Ratings.movieId = Movies.movieId GROUP BY Ratings.movieId ORDER BY total_ratings DESC LIMIT " + str(nRows) + " OFFSET " + str(start - 1)
         cursor.execute(command)
         result = [{"title" : title, "release_year" : release_year, "votes": votes, "avg_ratings":avg_ratings} 
@@ -126,25 +94,22 @@ def popular(start, end)-> List[Dict]:
     finally:
         cursor.close()
         connection.close()
-
-<<<<<<< HEAD
     return result
 
 
-
-@app.route("/")
-@cross_origin()
-def index():
-    return json.dumps({'movies': movies()})
-=======
->>>>>>> f2098243085cb16b5a885e6aaad99bf1a63bd42a
-
 # returns the start_th to the end_th most popular movies inclusive
 # requirements => start and end are both ints, start <= end, start >= 1 and end >= 1
-@app.route("/popular/<int:start>/<int:end>")
-def getMostPopular(start, end):
-    if start < 1 or end < 1 or start > end: abort(400)
-    return json.dumps({'most_popular' : popular(start, end)})
+# @app.route("/popular/<int:start>/<int:end>")
+@app.route("/popular")
+def getMostPopular():
+    try:
+        start = int(request.args.get('popularity_start'))
+        end = int(request.args.get('popularity_end'))
+        if start < 1 or end < 1 or start > end: abort(400)
+        return json.dumps({'most_popular' : popular(start, end)})
+    except ValueError as e:
+            abort(400, e)
+    return 'Something went wrong'
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
