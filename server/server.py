@@ -8,28 +8,26 @@ cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'  
 
 from typing import List, Dict
-from flask import Flask
+from flask import Flask, abort
 import mysql.connector
 from mysql.connector import errorcode
 import json
 
 app = Flask(__name__)
-
-
-def movies() -> List[Dict]:
-    config = {
+config = {
         'user': 'root',
         'password': 'root',
         'host': 'db',
         'port': '3306',
         'database': 'movies_db'
     }
-    results = None
+
+def movies() -> List[Dict]:
+    results = []
     try:
         connection = mysql.connector.connect(**config)
         cursor = connection.cursor()
         cursor.execute("SELECT * FROM Movies")
-        results = []
         for movieId, movieTitle, year, imdbId, tmdbId in cursor:
             results.append((movieId, movieTitle, year, imdbId, tmdbId))
         cursor.close()
@@ -42,21 +40,53 @@ def movies() -> List[Dict]:
         else:
             print(err)
     finally:
+        cursor.close()
+        connection.close()
+    return results
+
+def popular(start, end)-> List[Dict]:
+    result = []
+    try:
+        connection = mysql.connector.connect(**config)
+        cursor = connection.cursor()
+        nRows = end - start + 1
+        # command = "SELECT movies.title, movies.release_year, "
+        # "Sum(rating) as total_ratings, Count(rating) as votes, Avg(rating) as avg_ratings" 
+        # "FROM ratings, movies"
+        # "WHERE ratings.movieId = movies.movieId" 
+        # "GROUP BY ratings.movieId"
+        # "ORDER BY total_ratings DESC"
+        # "LIMIT" + str(nRows) + "OFFSET" + str(start - 1) + ";"
+        command = "SELECT Movies.title, Movies.release_year, Sum(Ratings.rating) as total_ratings, Count(Ratings.rating) as votes, Avg(Ratings.rating) as avg_ratings FROM Ratings, Movies WHERE Ratings.movieId = Movies.movieId GROUP BY Ratings.movieId ORDER BY total_ratings DESC LIMIT " + str(nRows) + " OFFSET " + str(start - 1)
+        cursor.execute(command)
+        result = [{"title" : title, "release_year" : release_year, "votes": votes, "avg_ratings":avg_ratings} 
+                   for title, release_year, total_ratings, votes, avg_ratings in cursor]
+    except mysql.connector.Error as err:
+        if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+            abort(500, "Something is wrong with your user name or password")
+        elif err.errno == errorcode.ER_BAD_DB_ERROR:
+            abort(500  ,"Database does not exist")
+        else:
+            abort(500, err)
+    finally:
+        cursor.close()
         connection.close()
 
-    # connection = mysql.connector.connect(**config)
-    # cursor = connection.cursor()
-    # cursor.execute('SELECT * FROM Movies')
-    # results = [{movieId: title} for (movieId, title, _, _) in cursor]
-    # cursor.close()
-    # connection.close()
+    return result
 
-    return results
+
 
 @app.route("/")
 @cross_origin()
 def index():
     return json.dumps({'movies': movies()})
+
+# returns the start_th to the end_th most popular movies inclusive
+# requirements => start and end are both ints, start <= end, start >= 1 and end >= 1
+@app.route("/popular/<int:start>/<int:end>")
+def getMostPopular(start, end):
+    if start < 1 or end < 1 or start > end: abort(400)
+    return json.dumps({'most_popular' : popular(start, end)})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
