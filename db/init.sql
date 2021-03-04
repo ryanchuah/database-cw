@@ -7,7 +7,7 @@ CREATE TABLE Movies (
   imdbId INT default -1,
   tmdbId INT default -1,
   release_year INT default -1,
-  poster_url VARCHAR(200),
+  -- poster_url VARCHAR(200),
   PRIMARY KEY (movieId)
 );
 
@@ -20,8 +20,8 @@ IGNORE 1 LINES;
 
 CREATE TABLE Genres (
   movieId INT not null,
-  genre VARCHAR(20) not null,
-  PRIMARY KEY (movieId, genre),
+  genres VARCHAR(20) not null,
+  PRIMARY KEY (movieId, genres),
   FOREIGN KEY (movieId) REFERENCES Movies(movieId)
 );
 
@@ -81,6 +81,12 @@ LINES TERMINATED BY '\n'
 IGNORE 1 LINES;
 
 
+CREATE TABLE Actors (
+  actorId INT not null,
+  actorName VARCHAR(100) not null,
+  PRIMARY KEY (actorId)
+);
+
 CREATE TABLE Actor_Roles (
   actorId INT not null,
   movieId INT not null,
@@ -89,9 +95,3 @@ CREATE TABLE Actor_Roles (
   FOREIGN KEY (actorId) REFERENCES Actors(actorId)
 );
 
-
-CREATE TABLE Actors (
-  actorId INT not null,
-  actorName VARCHAR(100) not null,
-  PRIMARY KEY (actorId)
-);
