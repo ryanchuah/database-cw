@@ -157,7 +157,13 @@ def movie_details():
 def get_most_popular():
     start, end = check_popular_input()
     holders = end - start + 1 , start - 1
-    command = "SELECT Movies.movieId, Movies.title, Movies.release_year, Sum(Ratings.rating) as total_ratings, Count(Ratings.rating) as votes, Avg(Ratings.rating) as avg_ratings FROM Ratings, Movies WHERE Ratings.movieId = Movies.movieId GROUP BY Ratings.movieId ORDER BY total_ratings DESC LIMIT %s OFFSET %s"
+    command = '''SELECT Movies.movieId, Movies.title, Movies.release_year, Sum(Ratings.rating) as total_ratings, 
+                 Count(Ratings.rating) as votes, Avg(Ratings.rating) as avg_ratings 
+                 FROM Ratings, Movies 
+                 WHERE Ratings.movieId = Movies.movieId 
+                 GROUP BY Ratings.movieId 
+                 ORDER BY total_ratings DESC 
+                 LIMIT %s OFFSET %s'''
     return json.dumps({'most_popular' : query(command, holders, popularity_result)})
 
 # returns the start_th to the end_th most polar movies inclusive
@@ -167,7 +173,13 @@ def get_most_popular():
 def get_most_polarising():
     start, end = check_popular_input()
     holders = end - start + 1 , start - 1
-    command = "SELECT Movies.movieId, Movies.title, Movies.release_year, VARIANCE(Ratings.rating) as polarity_index FROM Ratings, Movies WHERE Ratings.movieId = Movies.movieId GROUP BY Ratings.movieId ORDER BY polarity_index DESC LIMIT %s OFFSET %s"
+    command = '''SELECT Movies.movieId, Movies.title, Movies.release_year, 
+                 VARIANCE(Ratings.rating) as polarity_index 
+                 FROM Ratings, Movies 
+                 WHERE Ratings.movieId = Movies.movieId 
+                 GROUP BY Ratings.movieId 
+                 ORDER BY polarity_index DESC 
+                 LIMIT %s OFFSET %s'''
     return json.dumps({'most_polarising' : query(command, holders, polarity_result)})
 
 #PARAM: a list of genres [x, y, z]
