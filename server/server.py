@@ -170,7 +170,9 @@ def get_most_polarising():
     command = "SELECT Movies.movieId, Movies.title, Movies.release_year, VARIANCE(Ratings.rating) as polarity_index FROM Ratings, Movies WHERE Ratings.movieId = Movies.movieId GROUP BY Ratings.movieId ORDER BY polarity_index DESC LIMIT %s OFFSET %s"
     return json.dumps({'most_polarising' : query(command, holders, polarity_result)})
 
-#PARAM: a list of genres
+#PARAM: a list of genres [x, y, z]
+#Returns a list of genres each associated with the propotion of users that like [x,y,z]
+#Can display 'd% of users that like x,y,z also like a,b,c...'
 #EXAMPLE: http://localhost:5000/similar_genres?genre=Animation&genre=Adventure
 @app.route("/similar_genres")
 def get_similar_genres():
