@@ -71,6 +71,81 @@ def index():
         cursor.close()
         connection.close()
 
+@app.route("/search")
+def search_movies():
+    sortBy = request.args.get('sortBy')
+
+    Movies_columns = ['movieId', 'title', 'imdbId', 'tmdbId']
+    search_criteria = request.args.get('search_criteria')
+
+    if sortBy not in Movies_columns:
+        sortBy = None
+        raise ValueError(
+            f"the request query sortby={sortBy} is not recognized. Either developer error, or SQL injection attempt")
+
+    limit = request.args.get('limit')
+    if limit:
+        try:
+            limit = int(limit)
+        except ValueError:
+            raise ValueError(
+                f"the request query limit={limit} is not recognized. Either developer error, or SQL injection attempt")
+    else:
+        limit = 10
+    try:
+        connection = mysql.connector.connect(**config)
+        cursor = connection.cursor()
+        if not sortBy == None:
+            query = ("SELECT * FROM Movies WHERE title like \'%{search_criteria}%\' ORDER BY {sortBy} LIMIT {limit}")
+            cursor.execute(query)
+        else:
+            query = ("SELECT * FROM Movies WHERE title like \'%{search_criteria}%\' LIMIT {limit}")
+            cursor.execute(query)
+        movies = []
+        for movie in cursor:
+            movies.append({'movieId': movie[0], 'movieTitle': movie[1],
+                           'imdbId': movie[2], 'tmdbId': movie[3]})
+        cursor.close()
+        return {"movies": movies}
+    except mysql.connector.Error as err:
+        if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+            print("Something is wrong with your user name or password")
+        elif err.errno == errorcode.ER_BAD_DB_ERROR:
+            print("Database does not exist")
+        else:
+            print(err)
+    finally:
+        cursor.close()
+        connection.close()
+
+
+@app.route('/movies')
+def movie_details():
+    movie_id = int(request.args.get('movie_id'))
+    result = []
+    try:
+        connection = mysql.connector.connect(**config)
+        cursor = connection.cursor()
+        query = "SELECT title, release_year FROM Movies WHERE Movies.movieId = %s"
+        cursor.execute(query, (movie_id,))
+        result = [{"title": title, "release_year": release_year}
+                  for title, release_year in cursor]
+
+    except mysql.connector.Error as err:
+        if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+            abort(500, "Something is wrong with your user name or password")
+        elif err.errno == errorcode.ER_BAD_DB_ERROR:
+            abort(500, "Database does not exist")
+        else:
+            abort(500, err)
+    finally:
+        cursor.close()
+        connection.close()
+    print(result)
+
+    return str(result)
+
+
 def query(start, end, command, get_result) -> List[Dict]:
     result = []
     try:
@@ -89,6 +164,11 @@ def get_popularity_result(cursor):
     return [{"title": title, "release_year": release_year, "votes": votes, "avg_ratings": avg_ratings}
             for title, release_year, total_ratings, votes, avg_ratings in cursor]
 
+# returns the start_th to the end_th most popular movies inclusive
+# requirements => start and end are both ints, start <= end, start >= 1 and end >= 1
+#EXAMPLE: http://0.0.0.0:5000/popular?popularity_start=1&popularity_end=10
+# @app.route("/popular/<int:start>/<int:end>")
+@app.route("/popular")
 def get_polarity_result(cursor):
     return [{"title" : title, "release_year" : release_year, "polarity_index":polarity_index} 
              for title, release_year, polarity_index in cursor]
