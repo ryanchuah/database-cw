@@ -121,15 +121,20 @@ def search_movies():
 
 @app.route('/movies')
 def movie_details():
-    movie_id = int(request.args.get('movie_id'))
+    movie_id = request.args.get('movie_id')
+    try:
+        movie_id = int(request.args.get('movie_id'))
+    except ValueError as e:
+        abort(400, e)
+
     result = []
     try:
         connection = mysql.connector.connect(**config)
         cursor = connection.cursor()
-        query = "SELECT title, release_year FROM Movies WHERE Movies.movieId = %s"
+        query = "SELECT title, release_year, poster_url FROM Movies WHERE Movies.movieId = %s"
         cursor.execute(query, (movie_id,))
-        result = [{"title": title, "release_year": release_year}
-                  for title, release_year in cursor]
+        result = [{"title": title, "release_year": release_year, "poster_url": poster_url}
+                  for title, release_year, poster_url in cursor]
 
     except mysql.connector.Error as err:
         if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
@@ -143,7 +148,7 @@ def movie_details():
         connection.close()
     print(result)
 
-    return str(result)
+    return result
 
 
 def query(start, end, command, get_result) -> List[Dict]:
