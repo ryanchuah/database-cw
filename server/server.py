@@ -164,11 +164,7 @@ def get_popularity_result(cursor):
     return [{"title": title, "release_year": release_year, "votes": votes, "avg_ratings": avg_ratings}
             for title, release_year, total_ratings, votes, avg_ratings in cursor]
 
-# returns the start_th to the end_th most popular movies inclusive
-# requirements => start and end are both ints, start <= end, start >= 1 and end >= 1
-#EXAMPLE: http://0.0.0.0:5000/popular?popularity_start=1&popularity_end=10
-# @app.route("/popular/<int:start>/<int:end>")
-@app.route("/popular")
+
 def get_polarity_result(cursor):
     return [{"title" : title, "release_year" : release_year, "polarity_index":polarity_index} 
              for title, release_year, polarity_index in cursor]
@@ -187,6 +183,7 @@ def check_popular_input():
 
 # returns the start_th to the end_th most popular movies inclusive
 # requirements => start and end are both ints, start <= end, start >= 1 and end >= 1
+#EXAMPLE: http://0.0.0.0:5000/popular?start=1&end=10
 @app.route("/popular")
 def get_most_popular():
     start, end = check_popular_input()
@@ -197,6 +194,7 @@ def get_most_popular():
 
 # returns the start_th to the end_th most polar movies inclusive
 # requirements => start and end are both ints, start <= end, start >= 1 and end >= 1
+#EXAMPLE: http://0.0.0.0:5000/polarity?start=1&end=10
 @app.route("/polarity")
 def get_most_polarising():
     start, end = check_popular_input()
