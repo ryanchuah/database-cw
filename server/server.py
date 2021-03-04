@@ -156,7 +156,7 @@ def query(start, end, command, get_result) -> List[Dict]:
     try:
         connection = mysql.connector.connect(**config)
         cursor = connection.cursor()
-        cursor.execute(command)
+        cursor.execute(command[0], (command[1], command[2]))
         result = get_result(cursor)
     except mysql.connector.Error as err:
             abort(500, err)
@@ -169,11 +169,7 @@ def get_popularity_result(cursor):
     return [{"title": title, "release_year": release_year, "votes": votes, "avg_ratings": avg_ratings}
             for title, release_year, total_ratings, votes, avg_ratings in cursor]
 
-# returns the start_th to the end_th most popular movies inclusive
-# requirements => start and end are both ints, start <= end, start >= 1 and end >= 1
-#EXAMPLE: http://0.0.0.0:5000/popular?popularity_start=1&popularity_end=10
-# @app.route("/popular/<int:start>/<int:end>")
-@app.route("/popular")
+
 def get_polarity_result(cursor):
     return [{"title" : title, "release_year" : release_year, "polarity_index":polarity_index} 
              for title, release_year, polarity_index in cursor]
@@ -192,20 +188,23 @@ def check_popular_input():
 
 # returns the start_th to the end_th most popular movies inclusive
 # requirements => start and end are both ints, start <= end, start >= 1 and end >= 1
+#EXAMPLE: http://0.0.0.0:5000/popular?start=1&end=10
 @app.route("/popular")
 def get_most_popular():
     start, end = check_popular_input()
     nRows = end - start + 1
-    command = "SELECT Movies.title, Movies.release_year, Sum(Ratings.rating) as total_ratings, Count(Ratings.rating) as votes, Avg(Ratings.rating) as avg_ratings FROM Ratings, Movies WHERE Ratings.movieId = Movies.movieId GROUP BY Ratings.movieId ORDER BY total_ratings DESC LIMIT " + str( nRows) + " OFFSET " + str(start - 1)
+    command = "SELECT Movies.title, Movies.release_year, Sum(Ratings.rating) as total_ratings, Count(Ratings.rating) as votes, Avg(Ratings.rating) as avg_ratings FROM Ratings, Movies WHERE Ratings.movieId = Movies.movieId GROUP BY Ratings.movieId ORDER BY total_ratings DESC LIMIT %s OFFSET %s", nRows, start - 1
+
     return json.dumps({'most_popular' : query(start, end, command, get_popularity_result)})
 
 # returns the start_th to the end_th most polar movies inclusive
 # requirements => start and end are both ints, start <= end, start >= 1 and end >= 1
+#EXAMPLE: http://0.0.0.0:5000/polarity?start=1&end=10
 @app.route("/polarity")
 def get_most_polarising():
     start, end = check_popular_input()
     nRows = end - start + 1
-    command = "SELECT Movies.title, Movies.release_year, VARIANCE(Ratings.rating) as polarity_index FROM Ratings, Movies WHERE Ratings.movieId = Movies.movieId GROUP BY Ratings.movieId ORDER BY polarity_index DESC LIMIT " + str(nRows) + " OFFSET " + str(start - 1)
+    command = "SELECT Movies.title, Movies.release_year, VARIANCE(Ratings.rating) as polarity_index FROM Ratings, Movies WHERE Ratings.movieId = Movies.movieId GROUP BY Ratings.movieId ORDER BY polarity_index DESC LIMIT %s OFFSET %s", nRows, start - 1
     return json.dumps({'most_polarising' : query(start, end, command, get_polarity_result)})
 
 
