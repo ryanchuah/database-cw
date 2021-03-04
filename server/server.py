@@ -156,10 +156,9 @@ def movie_details():
 @app.route("/popular")
 def get_most_popular():
     start, end = check_popular_input()
-    nRows = end - start + 1
-    command = "SELECT Movies.movieId, Movies.title, Movies.release_year, Sum(Ratings.rating) as total_ratings, Count(Ratings.rating) as votes, Avg(Ratings.rating) as avg_ratings FROM Ratings, Movies WHERE Ratings.movieId = Movies.movieId GROUP BY Ratings.movieId ORDER BY total_ratings DESC LIMIT %s OFFSET %s", nRows, start - 1
-
-    return json.dumps({'most_popular' : query(start, end, command, get_popularity_result)})
+    holders = end - start + 1 , start - 1
+    command = "SELECT Movies.movieId, Movies.title, Movies.release_year, Sum(Ratings.rating) as total_ratings, Count(Ratings.rating) as votes, Avg(Ratings.rating) as avg_ratings FROM Ratings, Movies WHERE Ratings.movieId = Movies.movieId GROUP BY Ratings.movieId ORDER BY total_ratings DESC LIMIT %s OFFSET %s"
+    return json.dumps({'most_popular' : query(command, holders, popularity_result)})
 
 # returns the start_th to the end_th most polar movies inclusive
 # requirements => start and end are both ints, start <= end, start >= 1 and end >= 1
@@ -167,19 +166,26 @@ def get_most_popular():
 @app.route("/polarity")
 def get_most_polarising():
     start, end = check_popular_input()
-    nRows = end - start + 1
-    command = "SELECT Movies.movieId, Movies.title, Movies.release_year, VARIANCE(Ratings.rating) as polarity_index FROM Ratings, Movies WHERE Ratings.movieId = Movies.movieId GROUP BY Ratings.movieId ORDER BY polarity_index DESC LIMIT %s OFFSET %s", nRows, start - 1
-    return json.dumps({'most_polarising' : query(start, end, command, get_polarity_result)})
+    holders = end - start + 1 , start - 1
+    command = "SELECT Movies.movieId, Movies.title, Movies.release_year, VARIANCE(Ratings.rating) as polarity_index FROM Ratings, Movies WHERE Ratings.movieId = Movies.movieId GROUP BY Ratings.movieId ORDER BY polarity_index DESC LIMIT %s OFFSET %s"
+    return json.dumps({'most_polarising' : query(command, holders, polarity_result)})
+
+#PARAM: a list of genres
+#EXAMPLE: http://localhost:5000/similar_genres?genre=Animation&genre=Adventure
+@app.route("/similar_genres")
+def get_similar_genres():
+    genres = tuple(request.args.getlist('genre', type=str))
+    condition = create_condition(genres)
+    nUsers = get_interested_users(condition, genres)
+    return json.dumps({'similar_genres' : similar_genres(nUsers, condition, genres)})
 
 
-
-
-def query(start, end, command, get_result) -> List[Dict]:
-    result = []
+def query(command, holders, get_result):
+    result = None
     try:
         connection = mysql.connector.connect(**config)
         cursor = connection.cursor()
-        cursor.execute(command[0], (command[1], command[2]))
+        cursor.execute(command, (holders))
         result = get_result(cursor)
     except mysql.connector.Error as err:
             abort(500, err)
@@ -188,12 +194,16 @@ def query(start, end, command, get_result) -> List[Dict]:
         connection.close()
     return result
 
-def get_popularity_result(cursor):
+
+def extract_genres(cursor):
+    return [{"genres": genres, "proportion": float(proportion)} for genres, proportion in cursor]
+
+def popularity_result(cursor):
     return [{"movieId": movieId, "title": title, "release_year": release_year, "votes": votes, "avg_ratings": avg_ratings}
             for movieId, title, release_year, total_ratings, votes, avg_ratings in cursor]
 
 
-def get_polarity_result(cursor):
+def polarity_result(cursor):
     return [{"movieId": movieId, "title" : title, "release_year" : release_year, "polarity_index":polarity_index} 
              for movieId, title, release_year, polarity_index in cursor]
 
@@ -206,8 +216,46 @@ def check_popular_input():
         if start < 1 or end < 1 or start > end: abort(400)
     except ValueError as e:
         abort(400, e)
-        
     return start, end
+
+
+def similar_genres(nUsers, condition, genres):
+    having_condition = create_condition(genres, col='genres')
+    command = f'''SELECT genres, count(genres) / {nUsers} as proportion
+                FROM (SELECT  Genres.genres as genres
+                    FROM Ratings, Movies, Genres,
+                        (SELECT  DISTINCT Ratings.userId as uniqueUsers
+                        FROM Genres, Ratings, Movies
+                        WHERE Ratings.rating > 3 
+                        and Ratings.movieId = Movies.movieId
+                        and Movies.movieId = Genres.movieId
+                        and {condition}
+                        ) as userSpace
+                    WHERE Ratings.rating > 3 
+                    and userSpace.uniqueUsers = Ratings.userId
+                    and Ratings.movieId = Movies.movieId
+                    and Movies.movieId = Genres.movieId
+                    GROUP BY Ratings.userId, Genres.genres
+                    ) as genreSets
+                GROUP BY genres
+                HAVING NOT {having_condition}
+                ORDER BY proportion DESC'''
+    return query(command, genres + genres, extract_genres)
+    
+
+def get_interested_users(condition, genres):
+    command = f'''SELECT  COUNT(DISTINCT Ratings.userId) as interested_user 
+                  FROM Genres, Ratings, Movies 
+                  WHERE Ratings.rating > 3 and Ratings.movieId = Movies.movieId 
+                  and Movies.movieId = Genres.movieId and {condition}'''
+    return query(command, genres, lambda cursor : cursor.fetchone()[0])
+
+def create_condition(genres, col='Genres.genres'):
+    result = '('
+    for i in range(len(genres)):
+        result += f'{col} = %s'
+        if i != len(genres) - 1: result += ' or '
+    return result + ')'
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
