@@ -623,7 +623,7 @@ movieId,title,imdbId,tmdbId,release_year
 786,Eraser ,116213,9268,1996
 788,"Nutty Professor, The ",117218,9327,1996
 790,"Unforgettable Summer, An (Un été inoubliable) ",111546,81949,1994
-791,"Last Klezmer: Leopold Kozlowski, His Life and Music, The ",113610,-1,1994
+791,"Last Klezmer: Leopold Kozlowski, His Life and Music, The ",113610,706007,1994
 795,Somebody to Love ,111237,44535,1994
 798,Daylight ,116040,11228,1996
 799,"Frighteners, The ",116365,10779,1996
@@ -1641,7 +1641,7 @@ movieId,title,imdbId,tmdbId,release_year
 2185,I Confess ,45897,30159,1953
 2186,Strangers on a Train ,44079,845,1951
 2187,Stage Fright ,42994,1978,1950
-2188,54 ,120577,3682,1998
+2188,54,120577,3682,1998
 2190,Why Do Fools Fall In Love? ,123324,46702,1998
 2193,Willow ,96446,847,1988
 2194,"Untouchables, The ",94226,117,1987
@@ -2140,7 +2140,7 @@ movieId,title,imdbId,tmdbId,release_year
 2846,"Adventures of Milo and Otis, The (Koneko monogatari) ",97050,47951,1986
 2847,Only Angels Have Wings ,31762,43832,1939
 2848,"Othello (Tragedy of Othello: The Moor of Venice, The) ",45251,47697,1952
-2851,Saturn 3 ,81454,-1,1980
+2851,Saturn 3 ,81454,19761,1980
 2852,"Soldier's Story, A ",88146,26522,1984
 2856,I Saw What You Did ,59297,28295,1965
 2857,Yellow Submarine ,63823,12105,1968
@@ -3026,7 +3026,7 @@ movieId,title,imdbId,tmdbId,release_year
 4043,At Close Range ,90670,13715,1986
 4046,Friendly Persuasion ,49233,43258,1956
 4047,Gettysburg ,107007,10655,1993
-4051,Horrors of Spider Island (Ein Toter Hing im Netz) ,56600,-1,1960
+4051,Horrors of Spider Island (Ein Toter Hing im Netz) ,56600,31392,1960
 4052,Antitrust ,218817,9989,2001
 4053,Double Take ,238948,18828,2001
 4054,Save the Last Dance ,206275,9816,2001
@@ -3297,7 +3297,7 @@ movieId,title,imdbId,tmdbId,release_year
 4458,Africa: The Serengeti ,109049,13794,1994
 4459,Alaska: Spirit of the Wild ,130445,13795,1997
 4462,18 Again! ,94593,38965,1988
-4463,1969 ,94594,47817,1988
+4463,1969,94594,47817,1988
 4464,"Accidental Tourist, The ",94606,31052,1988
 4465,"Accused, The ",94608,10868,1988
 4466,Above the Law ,94602,9395,1988
@@ -3895,7 +3895,7 @@ movieId,title,imdbId,tmdbId,release_year
 5468,20 Million Miles to Earth ,50084,15096,1957
 5470,The Importance of Being Earnest ,44744,20324,1952
 5471,Perfect ,89798,49370,1985
-5472,1776 ,68156,14902,1972
+5472,1776,68156,14902,1972
 5475,Z ,65234,2721,1969
 5476,Halloween: Resurrection (Halloween 8) ,220506,11442,2002
 5477,Sex and Lucia (Lucía y el sexo) ,254455,1364,2001
@@ -4496,7 +4496,7 @@ movieId,title,imdbId,tmdbId,release_year
 6650,Kind Hearts and Coronets ,41546,11898,1949
 6654,Atragon (Kaitei Gunkan) ,57215,35072,1963
 6656,Attack of the Puppet People ,51381,44585,1958
-6658,10 ,78721,9051,1979
+6658,10,78721,9051,1979
 6659,Tremors ,100814,9362,1990
 6660,"Red Shoes, The ",40725,19542,1948
 6662,"Pink Panther, The ",57413,936,1963
@@ -4772,7 +4772,7 @@ movieId,title,imdbId,tmdbId,release_year
 7101,Doc Hollywood ,101745,11821,1991
 7102,Dragnet ,92925,10023,1987
 7103,Madhouse ,100087,51036,1990
-7104,1941 ,78723,11519,1979
+7104,1941,78723,11519,1979
 7107,Foul Play ,77578,15659,1978
 7108,Crime Story (Zhong an zu) ,108656,18857,1993
 7109,Beyond the Clouds (Al di là delle nuvole) ,114086,33517,1996
@@ -5531,7 +5531,7 @@ movieId,title,imdbId,tmdbId,release_year
 26567,Club Paradise ,90856,26555,1986
 26578,"Sacrifice, The (Offret - Sacraficatio) ",91670,24657,1986
 26585,"Better Tomorrow, A (Ying hung boon sik) ",92263,11471,1986
-26587,"Decalogue, The (Dekalog) ",92337,-1,1989
+26587,"Decalogue, The (Dekalog) ",92337,42699,1989
 26590,G.I. Joe: The Movie ,93066,17421,1987
 26593,Hell Comes to Frogtown ,93171,22572,1988
 26599,"Law of Desire (Ley del deseo, La) ",93412,4043,1987
@@ -5628,7 +5628,7 @@ movieId,title,imdbId,tmdbId,release_year
 27246,If These Walls Could Talk 2 ,206036,28031,2000
 27251,"10th Kingdom, The ",207275,110147,2000
 27255,"Wind Will Carry Us, The (Bad ma ra khahad bord) ",209463,43423,1999
-27266,2046 ,212712,844,2004
+27266,2046,212712,844,2004
 27306,Bartleby ,230025,53048,2001
 27311,Batman Beyond: Return of the Joker ,233298,16234,2000
 27317,Audition (Ôdishon) ,235198,11075,1999
@@ -5671,7 +5671,7 @@ movieId,title,imdbId,tmdbId,release_year
 27660,"Animatrix, The ",328832,55931,2003
 27664,"Brown Bunny, The ",330099,12703,2003
 27667,Ju-on: The Curse ,330500,32250,2000
-27674,11:14 ,331811,9282,2003
+27674,11:14,331811,9282,2003
 27683,Tremors 4: The Legend Begins ,334541,10891,2004
 27685,Bring It On Again ,334965,12540,2004
 27689,"Crimson Rivers 2: Angels of the Apocalypse (Rivières pourpres II - Les anges de l'apocalypse, Les) ",337103,60672,2004
@@ -5853,7 +5853,7 @@ movieId,title,imdbId,tmdbId,release_year
 32589,Beauty Shop ,388500,14177,2005
 32596,Sahara ,318649,7364,2005
 32598,Fever Pitch ,332047,11431,2005
-32600,Eros ,377059,-1,2004
+32600,Eros ,377059,39850,2004
 32620,Not on the Lips (Pas sur la bouche) ,356999,51945,2003
 32632,Electra Glide in Blue ,70022,26332,1973
 32649,"Special Day, A (Giornata particolare, Una) ",76085,42229,1977
@@ -6058,7 +6058,7 @@ movieId,title,imdbId,tmdbId,release_year
 40614,Derailed ,398017,8999,2005
 40617,Creep ,381966,8555,2004
 40629,Pride & Prejudice ,414387,4348,2005
-40697,Babylon 5,105946,-1,-1
+40697,Babylon 5,105946,3137,1994
 40723,Wolf Creek ,416315,9885,2005
 40732,"Descent, The ",435625,9392,2005
 40815,Harry Potter and the Goblet of Fire ,330373,674,2005
@@ -6188,7 +6188,7 @@ movieId,title,imdbId,tmdbId,release_year
 44929,Candy ,424880,4441,2006
 44931,Secrets of a Soul (Geheimnisse einer Seele) ,16914,84954,1926
 44937,"Child, The (L'enfant) ",456396,11490,2005
-44943,9/11 ,312318,11304,2002
+44943,09-Nov,312318,11304,2002
 44972,Scary Movie 4 ,362120,4257,2006
 44974,Hard Candy ,424136,2652,2005
 45028,"Prairie Home Companion, A ",420087,9526,2006
@@ -6432,7 +6432,7 @@ movieId,title,imdbId,tmdbId,release_year
 51562,Babylon 5: The Gathering ,106336,10942,1993
 51573,Meshes of the Afternoon ,36154,27040,1943
 51575,Wild Hogs ,486946,11199,2007
-51662,300 ,416449,1271,2007
+51662,300,416449,1271,2007
 51666,"Abandoned, The ",475937,10790,2006
 51694,Starter for 10 ,477095,14055,2006
 51698,"Last Mimzy, The ",768212,2267,2007
@@ -6515,7 +6515,7 @@ movieId,title,imdbId,tmdbId,release_year
 53883,"Power of Nightmares, The: The Rise of the Politics of Fear ",430484,49870,2004
 53894,Sicko ,386032,2359,2007
 53921,"Mighty Heart, A ",829459,1988,2007
-53953,1408 ,450385,3021,2007
+53953,1408,450385,3021,2007
 53956,Death at a Funeral ,795368,2196,2007
 53972,Live Free or Die Hard ,337978,1571,2007
 53974,License to Wed ,762114,2959,2007
@@ -6713,7 +6713,7 @@ movieId,title,imdbId,tmdbId,release_year
 58627,Never Back Down ,1023111,8456,2008
 58655,Drillbit Taylor ,817538,8457,2008
 58783,Youth Without Youth ,481797,7797,2007
-58803,21 ,478087,8065,2008
+58803,21,478087,8065,2008
 58806,Smart People ,858479,12890,2008
 58826,"Shepherd: Border Patrol, The ",827521,24411,2008
 58839,Leatherheads ,379865,4942,2008
@@ -7118,7 +7118,7 @@ movieId,title,imdbId,tmdbId,release_year
 70990,If These Walls Could Talk ,116607,35203,1996
 70994,Halloween II ,1311067,24150,2009
 71033,"Secret in Their Eyes, The (El secreto de sus ojos) ",1305806,25376,2009
-71057,9 ,472033,12244,2009
+71057,9,472033,12244,2009
 71106,Frequently Asked Questions About Time Travel ,910554,22494,2009
 71108,"White Ribbon, The (Das weiße Band) ",1149362,37903,2009
 71129,Green Lantern: First Flight ,1384590,17445,2009
@@ -7184,7 +7184,7 @@ movieId,title,imdbId,tmdbId,release_year
 72308,Battlestar Galactica: The Plan ,1286130,105077,2009
 72330,"Private Lives of Pippa Lee, The ",1134629,4475,2009
 72356,Partly Cloudy ,1425244,24480,2009
-72378,2012 ,1190080,14161,2009
+72378,2012,1190080,14161,2009
 72395,Precious ,929632,25793,2009
 72405,Bad Lieutenant: Port of Call New Orleans ,1095217,11699,2009
 72407,"Twilight Saga: New Moon, The ",1259571,18239,2009
@@ -7381,7 +7381,7 @@ movieId,title,imdbId,tmdbId,release_year
 79259,Cherrybomb ,1248971,40850,2009
 79274,Batman: Under the Red Hood ,1569923,40662,2010
 79293,Salt ,944835,27576,2010
-79299,"No. 1 Ladies' Detective Agency, The ",874957,-1,2008
+79299,"No. 1 Ladies' Detective Agency, The ",874957,7154,2008
 79333,Watch Out for the Automobile (Beregis avtomobilya) ,60161,39768,1966
 79357,Mr. Nobody ,485947,31011,2009
 79428,Dinner for Schmucks ,427152,38778,2010
@@ -8138,7 +8138,7 @@ movieId,title,imdbId,tmdbId,release_year
 101765,"Perfect Plan, A (Plan parfait, Un) ",1986843,133698,2012
 101864,Oblivion ,1483013,75612,2013
 101884,Dark Tide ,1507563,59963,2012
-101895,42 ,453562,109410,2013
+101895,42,453562,109410,2013
 101962,Wolf Children (Okami kodomo no ame to yuki) ,2140203,110420,2012
 101973,Disconnect ,1433811,127517,2012
 102007,"Invincible Iron Man, The ",903135,13647,2007
@@ -9389,7 +9389,7 @@ movieId,title,imdbId,tmdbId,release_year
 163809,Over the Garden Wall ,3718778,409696,2013
 163925,"Wings, Legs and Tails ",1350929,333372,1986
 163937,Blair Witch ,1540011,351211,2016
-163981,31 ,3835080,284564,2016
+163981,31,3835080,284564,2016
 163985,ARQ ,5640450,410199,2016
 164179,Arrival ,2543164,329865,2016
 164200,Storks ,4624424,332210,2016
