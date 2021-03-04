@@ -76,7 +76,7 @@ def query(start, end, command, get_result) -> List[Dict]:
     try:
         connection = mysql.connector.connect(**config)
         cursor = connection.cursor()
-        cursor.execute(command)
+        cursor.execute(command[0], (command[1], command[2]))
         result = get_result(cursor)
     except mysql.connector.Error as err:
             abort(500, err)
@@ -111,7 +111,8 @@ def check_popular_input():
 def get_most_popular():
     start, end = check_popular_input()
     nRows = end - start + 1
-    command = "SELECT Movies.title, Movies.release_year, Sum(Ratings.rating) as total_ratings, Count(Ratings.rating) as votes, Avg(Ratings.rating) as avg_ratings FROM Ratings, Movies WHERE Ratings.movieId = Movies.movieId GROUP BY Ratings.movieId ORDER BY total_ratings DESC LIMIT " + str( nRows) + " OFFSET " + str(start - 1)
+    command = "SELECT Movies.title, Movies.release_year, Sum(Ratings.rating) as total_ratings, Count(Ratings.rating) as votes, Avg(Ratings.rating) as avg_ratings FROM Ratings, Movies WHERE Ratings.movieId = Movies.movieId GROUP BY Ratings.movieId ORDER BY total_ratings DESC LIMIT %s OFFSET %s", nRows, start - 1
+
     return json.dumps({'most_popular' : query(start, end, command, get_popularity_result)})
 
 # returns the start_th to the end_th most polar movies inclusive
@@ -120,7 +121,7 @@ def get_most_popular():
 def get_most_polarising():
     start, end = check_popular_input()
     nRows = end - start + 1
-    command = "SELECT Movies.title, Movies.release_year, VARIANCE(Ratings.rating) as polarity_index FROM Ratings, Movies WHERE Ratings.movieId = Movies.movieId GROUP BY Ratings.movieId ORDER BY polarity_index DESC LIMIT " + str(nRows) + " OFFSET " + str(start - 1)
+    command = "SELECT Movies.title, Movies.release_year, VARIANCE(Ratings.rating) as polarity_index FROM Ratings, Movies WHERE Ratings.movieId = Movies.movieId GROUP BY Ratings.movieId ORDER BY polarity_index DESC LIMIT %s OFFSET %s", nRows, start - 1
     return json.dumps({'most_polarising' : query(start, end, command, get_polarity_result)})
 
 
