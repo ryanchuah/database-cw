@@ -1,0 +1,56 @@
+[
+	{
+		"tmdbId": 3137,
+		"issue": ["This is a TV series, not a movie"]
+	},
+	{
+		"tmdbId": 7154,
+		"issue": ["This is a TV series, not a movie"]
+	},
+	{
+		"imdbId": 102336,
+		"issue": ["The tmdbId is not known"],
+		"todo": ["Manually add poster and actors"]
+	},
+	{
+		"tmdbId": [
+			124626,
+			146599,
+			290157,
+			131957,
+			92769,
+			171857,
+			27768,
+			410921,
+			125587,
+			55146,
+			113286,
+			198469,
+			171982,
+			56235,
+			117259,
+			113279,
+			95682,
+			78248,
+			41316,
+			25757,
+			228890,
+			38785,
+			174598,
+			21245,
+			37511,
+			24792,
+			48585,
+			195862,
+			148184,
+			16487,
+			195065,
+			103008,
+			363444,
+			152047,
+			360617
+		],
+		"issue": ["No poster found"],
+		"todo": ["Manually add poster or return blank poster"]
+	}
+]

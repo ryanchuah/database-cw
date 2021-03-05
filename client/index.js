@@ -14,7 +14,7 @@ sortByElement.onchange = function () {
 	window.localStorage.setItem("sortByValue", JSON.stringify(sortByValue));
 };
 
-async function updateDisplay(sortByValue, limit) {
+async function updateDisplay(sortByValue, limit, page, column) {
 	// most calls to updateDisplay will be through updatePage()
 	// updatePage() handles sets sortByValue and limit to non-null/non-undefined values, so
 	// sortByValue and limit will never be undefined
@@ -23,10 +23,16 @@ async function updateDisplay(sortByValue, limit) {
 	moviesTableBody.innerHTML = "";
 
 	let url =
-		"http://localhost:5000?limit=" +
+		"http://localhost:5000/movies?limit=" +
 		limit +
 		"&sortBy=" +
-		(sortByValue == "default" ? "movieId" : sortByValue);
+		sortByValue +
+		"&page=" +
+		page;
+
+	if (column) {
+		url += "&column=" + column;
+	}
 	console.log(url);
 
 	const response = await fetch(url);
@@ -46,23 +52,86 @@ async function updateDisplay(sortByValue, limit) {
 			let movieId = document.createElement("td");
 			movieId.innerHTML = movie.movieId;
 
-			let movieName = document.createElement("td");
-			movieName.innerHTML = movie.movieTitle;
+			let title = document.createElement("td");
+			title.innerHTML = movie.title;
+
+			let release_year = document.createElement("td");
+			release_year.innerHTML = movie.release_year;
+
+			let avg_ratings = document.createElement("td");
+			avg_ratings.innerHTML = movie.avg_ratings;
+
+			let votes = document.createElement("td");
+			votes.innerHTML = movie.votes;
 
 			tr.appendChild(movieId);
-			tr.appendChild(movieName);
+			tr.appendChild(title);
+			tr.appendChild(release_year);
+			tr.appendChild(avg_ratings);
+			tr.appendChild(votes);
 			moviesTableBody.appendChild(tr);
 		}
 	}
 }
 
-function updatePage(sortByValue, limit) {
+function updatePagination(page) {
+	// HTML "Sort By" element
+	const pagination = document.getElementById("pagination");
+	if (page == 1) {
+		pagination.innerHTML = `
+        <li class="page-item">
+            <a class="page-link" href="#" onclick="updatePage(null, null, ${
+				page - 1
+			})" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+            </a>
+        </li>
+        <li class="page-item active"><a class="page-link" href="#">${page}</a></li>
+        <li class="page-item"><a class="page-link" href="#" onclick="updatePage(null, null, ${
+			page + 1
+		})">${page + 1}</a></li>
+        <li class="page-item"><a class="page-link" href="#" onclick="updatePage(null, null, ${
+			page + 2
+		})">${page + 2}</a></li>
+        <li class="page-item">
+            <a class="page-link" href="#" onclick="updatePage(null, null, ${
+				page + 1
+			})" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+            </a>
+        </li>`;
+	} else {
+		pagination.innerHTML = `
+        <li class="page-item">
+            <a class="page-link" href="#" onclick="updatePage(null, null, ${
+				page - 1
+			})" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+            </a>
+        </li>
+        <li class="page-item"><a class="page-link" href="#">${page - 1}</a></li>
+        <li class="page-item active"><a class="page-link" href="#" onclick="updatePage(null, null, ${page})">${page}</a></li>
+        <li class="page-item"><a class="page-link" href="#" onclick="updatePage(null, null, ${
+			page + 1
+		})">${page + 1}</a></li>
+        <li class="page-item">
+            <a class="page-link" href="#" onclick="updatePage(null, null, ${
+				page + 1
+			})" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+            </a>
+        </li>`;
+	}
+}
+
+// this function handles the sanity check for sortByValue, limit, page before passing on to updateDisplay(..)
+function updatePage(sortByValue, limit, page) {
 	// if sortByValue is null, then we check if it is stored in localStorage
 	// if it is not stored in localStorage, we use the value "default"
 	if (!sortByValue) {
 		sortByValue = window.localStorage.getItem("sortByValue")
 			? JSON.parse(window.localStorage.getItem("sortByValue"))
-			: "default";
+			: "popularity";
 	}
 
 	// update "selected" attribute in sortBy HTML element
@@ -92,50 +161,22 @@ function updatePage(sortByValue, limit) {
 		}
 	}
 
-	updateDisplay(sortByValue, limit);
+	if (!page) {
+		page = 1;
+	}
+
+	let column;
+	if (sortByValue != "polarity" && sortByValue != "popularity") {
+		console.log("HERE");
+
+		// means we are sorting by column name
+		column = sortByValue;
+		sortByValue = "column";
+	}
+
+	updateDisplay(sortByValue, limit, page, column);
+	updatePagination(page);
 }
 
 // call updatePage() on every page load
 updatePage();
-
-// tutorial function. This function is not actually used anywhere
-// it's just meant to give a feel for JS
-async function insertColor() {
-	const response = await fetch("http://localhost:5000/");
-	if (!response.ok) {
-		console.error(
-			"Error response from server. Error code: ",
-			response.status
-		);
-	} else {
-		const data = await response.json();
-
-		const fav_colors = data.favorite_colors;
-
-		// fav_colors is an array of objects:
-		console.log(fav_colors); // [{Zahra: "blue"}, {Chak: "yellow"}]
-
-		let tag;
-		let text;
-
-		for (color_obj of fav_colors) {
-			// iterate through array
-			console.log(color_obj); // {Zahra: "blue"}
-			// iterate through object
-			for (const user in color_obj) {
-				console.log(user); // Zahra
-
-				tag = document.createElement("li");
-
-				text = document.createTextNode(
-					`${user} likes ${color_obj[user]}`
-				);
-				tag.appendChild(text);
-
-				color.appendChild(tag);
-			}
-		}
-	}
-}
-
-// insertColor();

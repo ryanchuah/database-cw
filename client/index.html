@@ -41,22 +41,60 @@
 			class="form-select"
 			aria-label="Default select example"
 		>
-			<option value="default">Sort by</option>
+			<option value="popularity">Popularity</option>
+			<option value="polarity">Polarity</option>
 
 			<!-- value MUST correspond to a column name in Movies table -->
 			<option value="movieId">Movie ID</option>
-			<option value="title">Movie Name</option>
+			<option value="title">Title</option>
 		</select>
 
 		<table class="table">
 			<thead>
 				<tr>
 					<th scope="col">MovieId</th>
-					<th scope="col">Movie Name</th>
+					<th scope="col">Title</th>
+					<th scope="col">Release Year</th>
+					<th scope="col">Avg. Rating</th>
+					<th scope="col">Votes</th>
 				</tr>
 			</thead>
 			<tbody id="moviesTableBody"></tbody>
 		</table>
+
+		<nav aria-label="Page navigation">
+			<ul class="pagination" id="pagination">
+				<li class="page-item">
+					<a class="page-link" href="#" aria-label="Previous">
+						<span aria-hidden="true">&laquo;</span>
+					</a>
+				</li>
+
+				<li class="page-item">
+					<a
+						class="page-link"
+						href="#"
+						onclick="updatePage(null, null, )"
+						>1</a
+					>
+				</li>
+				<li class="page-item">
+					<a class="page-link" href="#" onclick="updatePage(null, 50)"
+						>2</a
+					>
+				</li>
+				<li class="page-item">
+					<a class="page-link" href="#" onclick="updatePage(null, 50)"
+						>3</a
+					>
+				</li>
+				<li class="page-item">
+					<a class="page-link" href="#" aria-label="Next">
+						<span aria-hidden="true">&raquo;</span>
+					</a>
+				</li>
+			</ul>
+		</nav>
 
 		<script src="index.js"></script>
 
