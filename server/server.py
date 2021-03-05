@@ -177,27 +177,32 @@ def search_movies():
         connection.close()
 
 
-# PARAM: a list of genres [x, y, z]
-# Returns a list of genres [a, b...] each associated with the propotion of users that like [x,y,z]
-# Can display 'd% of users that like x,y,z also like a'
-#            'd% of users that like x,y,z also like b' etc..
-# EXAMPLE: http://localhost:5000/similar_genres?genre=Animation&genre=Adventure
-
-
-<<<<<<< HEAD
 #PARAM: a list of genres [x, y, z...]
 #Returns a list of genres [a, b...] each associated with the propotion of users that like [x,y,z]
 #Can display 'd% of users that like x,y,z also like a'
-#            'd% of users that like x,y,z also like b' etc..
+#            'c% of users that like x,y,z also like b' etc..
 #EXAMPLE: http://localhost:5000/similar_genres?genre=Animation&genre=Adventure
-=======
->>>>>>> aebc616e7f2218dd8fc5a994a69cc47e805081e5
 @app.route("/similar_genres")
 def get_similar_genres():
     genres = tuple(request.args.getlist('genre', type=str))
+    if not genres: abort(400, 'Please use \'genre\' as param')
     condition = create_condition(genres)
     nUsers = get_interested_users(condition, genres)
     return json.dumps({'similar_genres': similar_genres(nUsers, condition, genres)})
+
+
+#Param: a list of tags [x, y, z...]
+#Returns a list of genres [a, b...] each associated with a propotion of users used tags [x, y, z...]
+#Can display 'd% of users that used tags x,y,z also like genre a'
+#            'c% of users that used tags x,y,z also like genre b' etc..
+#Example: http://localhost:5000/similar_tags?tag=funny&tag=superhero&tag=family
+@app.route("/similar_tags")
+def get_tagged_genres():
+    tags = tuple(request.args.getlist('tag', type=str))
+    if not tags: abort(400, 'Please use \'tag\' as param')
+    condition = create_condition(tags, col='Tags.tag')
+    nUsers = get_users_with_tags(condition, tags)
+    return json.dumps({'similar_genres': tagged_genres(nUsers, condition, tags)})
 
 
 def query(command, holders, get_result):
@@ -261,6 +266,28 @@ def get_interested_users(condition, genres):
     return query(command, genres, lambda cursor: cursor.fetchone()[0])
 
 
+def tagged_genres(nUsers, condition, tags):
+    command = f''' SELECT genres, count(genres) / {nUsers} as proportion
+                    FROM (
+                        SELECT Tags.userId as userId, Genres.genres as genres
+                        FROM Tags, Ratings, Users, Genres
+                        WHERE {condition}
+                        and Users.userId = Tags.userId
+                        and Ratings.userId = Tags.userId
+                        and Ratings.movieId = Tags.movieId
+                        and Genres.movieId = Ratings.movieId
+                        and Ratings.rating > 3
+                        GROUP BY Genres.genres, Tags.userId) as temp
+                    GROUP BY genres
+                    ORDER BY proportion DESC'''
+    return query(command, tags, extract_genres)
+
+def get_users_with_tags(condition, tags):
+    command = f''' SELECT count(Distinct Tags.userId)
+                  FROM Tags
+                  WHERE {condition}'''
+    return query(command, tags, lambda cursor: cursor.fetchone()[0])          
+
 def create_condition(genres, col='Genres.genres'):
     result = '('
     for i in range(len(genres)):
@@ -268,38 +295,6 @@ def create_condition(genres, col='Genres.genres'):
         if i != len(genres) - 1:
             result += ' or '
     return result + ')'
-
-
-# @app.route('/movies')
-# def movie_details():
-#     movie_id = request.args.get('movie_id')
-#     try:
-#         movie_id = int(request.args.get('movie_id'))
-#     except ValueError as e:
-#         abort(400, e)
-
-#     result = []
-#     try:
-#         connection = mysql.connector.connect(**config)
-#         cursor = connection.cursor()
-#         query = "SELECT title, release_year, poster_url FROM Movies WHERE Movies.movieId = %s"
-#         cursor.execute(query, (movie_id,))
-#         result = [{"title": title, "release_year": release_year, "poster_url": poster_url}
-#                   for title, release_year, poster_url in cursor]
-
-#     except mysql.connector.Error as err:
-#         if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
-#             abort(500, "Something is wrong with your user name or password")
-#         elif err.errno == errorcode.ER_BAD_DB_ERROR:
-#             abort(500, "Database does not exist")
-#         else:
-#             abort(500, err)
-#     finally:
-#         cursor.close()
-#         connection.close()
-#     print(result)
-
-#     return result
 
 
 if __name__ == '__main__':
