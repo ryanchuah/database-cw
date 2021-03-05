@@ -182,7 +182,7 @@ def get_most_polarising():
                  LIMIT %s OFFSET %s'''
     return json.dumps({'most_polarising' : query(command, holders, polarity_result)})
 
-#PARAM: a list of genres [x, y, z]
+#PARAM: a list of genres [x, y, z...]
 #Returns a list of genres [a, b...] each associated with the propotion of users that like [x,y,z]
 #Can display 'd% of users that like x,y,z also like a'
 #            'd% of users that like x,y,z also like b' etc..
