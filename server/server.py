@@ -27,8 +27,53 @@ config = {
 @app.route('/movies/<movie_id>')
 @cross_origin()
 def single_movie(movie_id):
-    return "individual movie page data will be returned here for movieid: "+movie_id
+    #TODO: Add in poster and language and actors when tavles created
+    holders = movie_id,
+    details_command = '''SELECT Movies.title, Movies.release_year, Avg(Ratings.rating) as avg_ratings
+                 FROM Ratings, Movies
+                 WHERE Movies.movieId = %s AND Ratings.movieId = Movies.movieId
+                 '''
 
+    genre_command = '''SELECT genres FROM Genres
+                 WHERE Genres.movieId = %s'''
+
+    actors_command = '''SELECT actorName
+                        FROM Actors, Actor_Roles
+                        WHERE Actors.actorId = Actor_Roles.actorId AND Actor_Roles.movieId = %s'''
+
+
+    tags_command = '''SELECT tag, COUNT(tag) AS occurence
+                      FROM Tags
+                      WHERE Tags.movieId = %s
+                      GROUP BY tag
+                      ORDER BY occurence DESC 
+                      LIMIT 3
+                      '''
+
+    ratings_date_command = '''SELECT Ratings.rating, Ratings.timestamp
+                      FROM Ratings, Movies
+                      WHERE Ratings.movieId = %s = Movies.movieId AND (extract(YEAR from timestamp) < Movies.release_year + 2) 
+                      ORDER BY timestamp ASC
+                      '''
+
+    ratings_percentage_command = '''SELECT rating, COUNT(rating) AS occurence
+                      FROM Ratings
+                      WHERE Ratings.movieId = %s
+                      GROUP BY rating
+                      ORDER BY rating ASC
+                 '''
+
+
+    movie_details = {'details': query(details_command, holders, individual_movie_result),
+                     'genres': query(genre_command, holders, genres_movie_result),
+                     'actors': query(actors_command, holders, actors_movie_result),
+                     'tags': query(tags_command, holders, tags_movie_result),
+                     'ratings_date': query(ratings_date_command, holders, ratings_date_movie_result),
+                     'ratings_percentage': query(ratings_percentage_command, holders, ratings_percentage_movie_result)}
+
+    # print(movie_details)
+    # return "individual movie page data will be returned here for movieid: "+movie_id
+    return movie_details
 
 @app.route('/movies')
 @cross_origin()
@@ -232,6 +277,34 @@ def popularity_result(cursor):
 def polarity_result(cursor):
     return [{"movieId": movieId, "title": title, "release_year": release_year, "polarity_index": polarity_index}
             for movieId, title, release_year, polarity_index in cursor]
+
+
+def individual_movie_result(cursor):
+    return [{"title": title, "release_year": release_year, "avg_rating": avg_rating}
+            for title, release_year, avg_rating in cursor]
+
+def genres_movie_result(cursor):
+    return [{"genres": genres}
+            for genres in cursor]
+
+
+def actors_movie_result(cursor):
+    return [{"actor": actorName}
+            for actorName in cursor]
+
+
+def tags_movie_result(cursor):
+    return [{"tag": tag}
+            for tag in cursor]
+
+
+def ratings_date_movie_result(cursor):
+    return [{"rating": rating, "timestamp": timestamp}
+            for rating, timestamp in cursor]
+
+def ratings_percentage_movie_result(cursor):
+    return [{"rating": rating, "occurence": occurence}
+            for rating, occurence in cursor]
 
 
 def similar_genres(nUsers, condition, genres):
