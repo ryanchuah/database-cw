@@ -222,32 +222,48 @@ def search_movies():
         connection.close()
 
 
-#PARAM: a list of genres [x, y, z...]
-#Returns a list of genres [a, b...] each associated with the propotion of users that like [x,y,z]
-#Can display 'd% of users that like x,y,z also like a'
-#            'c% of users that like x,y,z also like b' etc..
-#EXAMPLE: http://localhost:5000/similar_genres?genre=Animation&genre=Adventure
+# PARAM: a movieId
+# Returns a list of genres [a, b...] each associated with a proportion
+# of users that like this movie and that genre
+# Can display 'd% of users that like Toy story also like genre a'
+#             'c% of users that like avengers also like genere b' etc..
+#EXAMPLE: http://localhost:5000/similar_genres?movieId=3
 @app.route("/similar_genres")
 def get_similar_genres():
-    genres = tuple(request.args.getlist('genre', type=str))
-    if not genres: abort(400, 'Please use \'genre\' as param')
+    movieId = int(request.args.get('movieId', type=int))
+    if not movieId: abort(400, 'Please use \'movieId\' as param')
+    genre_command = '''SELECT genres FROM Genres WHERE Genres.movieId = %s'''
+    holders = movieId,
+    genres = query(genre_command, holders, genres_movie_result)
+    if not genres: return {'similar_genres' : 'no genres'}
     condition = create_condition(genres)
-    nUsers = get_interested_users(condition, genres)
-    return json.dumps({'similar_genres': similar_genres(nUsers, condition, genres)})
+    nUsers = get_nUsers(condition, genres)
+    return {'similar_genres': similar_genres(nUsers, condition, genres)}
 
 
-#Param: a list of tags [x, y, z...]
-#Returns a list of genres [a, b...] each associated with a propotion of users used tags [x, y, z...]
+# PARAM: a movieId
+# Returns a list of genres [a, b...] each associated with a proportion
+# of users that have used this movie's tags and like that genre.
+# Also returns this movie's tags
 #Can display 'd% of users that used tags x,y,z also like genre a'
 #            'c% of users that used tags x,y,z also like genre b' etc..
-#Example: http://localhost:5000/similar_tags?tag=funny&tag=superhero&tag=family
+#Example: http://localhost:5000/similar_tags?movieId=1
 @app.route("/similar_tags")
 def get_tagged_genres():
-    tags = tuple(request.args.getlist('tag', type=str))
-    if not tags: abort(400, 'Please use \'tag\' as param')
+    movieId = int(request.args.get('movieId', type=int))
+    if not movieId: abort(400, 'Please use \'movieId\' as param')
+    tags_command = '''SELECT tag, COUNT(tag) AS occurence
+                      FROM Tags
+                      WHERE Tags.movieId = %s
+                      GROUP BY tag
+                      ORDER BY occurence DESC
+                      '''
+    holders = movieId,
+    tags_dict = query(tags_command, holders, tags_movie_result)
+    tags = [element['tag'] for element in tags_dict]
     condition = create_condition(tags, col='Tags.tag')
     nUsers = get_users_with_tags(condition, tags)
-    return json.dumps({'similar_genres': tagged_genres(nUsers, condition, tags)})
+    return {'similar_genres': tagged_genres(nUsers, condition, tags), "tags": tags_dict}
 
 
 def query(command, holders, get_result):
@@ -284,8 +300,7 @@ def individual_movie_result(cursor):
             for title, release_year, avg_rating in cursor]
 
 def genres_movie_result(cursor):
-    return [{"genres": genres}
-            for genres in cursor]
+    return [genre[0] for genre in cursor]
 
 
 def actors_movie_result(cursor):
@@ -294,8 +309,7 @@ def actors_movie_result(cursor):
 
 
 def tags_movie_result(cursor):
-    return [{"tag": tag}
-            for tag in cursor]
+    return [{"tag": tag, "occurence" : occurence} for tag, occurence in cursor]
 
 
 def ratings_date_movie_result(cursor):
@@ -331,7 +345,7 @@ def similar_genres(nUsers, condition, genres):
     return query(command, genres + genres, extract_genres)
 
 
-def get_interested_users(condition, genres):
+def get_nUsers(condition, genres):
     command = f'''SELECT  COUNT(DISTINCT Ratings.userId) as interested_user 
                   FROM Genres, Ratings, Movies 
                   WHERE Ratings.rating > 3 and Ratings.movieId = Movies.movieId 
@@ -362,6 +376,7 @@ def get_users_with_tags(condition, tags):
     return query(command, tags, lambda cursor: cursor.fetchone()[0])          
 
 def create_condition(genres, col='Genres.genres'):
+    if not len(genres):return "FALSE"
     result = '('
     for i in range(len(genres)):
         result += f'{col} = %s'
