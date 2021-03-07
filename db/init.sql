@@ -116,7 +116,7 @@ CREATE TABLE Personality_Ratings_tables (
   PRIMARY KEY (hashed_userId, movieId)
 );
 
-LOAD DATA INFILE '/var/lib/mysql-files/datasets/hasedUserId_movieid_ratings.csv'
+LOAD DATA INFILE '/var/lib/mysql-files/datasets/hashedUserId_movieid_ratings.csv'
 INTO TABLE Actor_Roles
 FIELDS TERMINATED BY ','
 ENCLOSED BY '"'
