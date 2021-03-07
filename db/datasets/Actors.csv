@@ -1,4 +1,4 @@
-actor_id,actor_name
+actorId,actorName
 0Aarne Aksila,Aarne Aksila
 0Aaron Swartz,Aaron Swartz
 0Abdolrahman Bagheri,Abdolrahman Bagheri
@@ -311,7 +311,7 @@ actor_id,actor_name
 0Christian Aaron Boulogne,Christian Aaron Boulogne
 0Christian Casas,Christian Casas
 0Christin Ackerman,Christin Ackerman
-0Christine'a Mama Quest Rainey,Christine'a Mama Quest Rainey
+"0Christine'a ""Mama Quest"" Rainey","Christine'a ""Mama Quest"" Rainey"
 0Christoph Colomb,Christoph Colomb
 0Christopher Beiring,Christopher Beiring
 0Christopher Graham,Christopher Graham
@@ -764,7 +764,7 @@ actor_id,actor_name
 0Jesse Friedman,Jesse Friedman
 0Jessica Duffy,Jessica Duffy
 0Jessie,Jessie
-0Jessie Misskelley Jr.,Jessie Misskelley Jr.
+"0Jessie Misskelley, Jr.","Jessie Misskelley, Jr."
 0Jessie Wiseman,Jessie Wiseman
 0Jim Bakker,Jim Bakker
 0Jim Bloom,Jim Bloom
@@ -829,7 +829,7 @@ actor_id,actor_name
 0José Legarreta,José Legarreta
 0José Luis Gutiérrez,José Luis Gutiérrez
 0José Navar,José Navar
-0Juan Doc Restrepo,Juan Doc Restrepo
+"0Juan ""Doc"" Restrepo","Juan ""Doc"" Restrepo"
 0Juan Andrés Silva,Juan Andrés Silva
 0Juanita Vera,Juanita Vera
 0Judith Barsi,Judith Barsi
@@ -1720,7 +1720,7 @@ actor_id,actor_name
 1M6OsklnlOT4MFrMjq1k8QCBq3c,Ross Partridge
 1MYnPxhU9GnhkitxVoWuR9kNiqu,Kang Hye-jung
 1McAEXIhRW2Q3LJsX3os90UXcJz,John Michael Higgins
-1MjdjnXHokywKz6LZ1b26O5FklA,Weird Al Yankovic
+1MjdjnXHokywKz6LZ1b26O5FklA,"""Weird Al"" Yankovic"
 1MmkWYNjRwGJXOCpLd7ZABT7YVT,Do Thi Hai Yen
 1NHiUReBIltBWeZhunwQuKvs4HT,Guillermo Toledo
 1Noqg93qBUnNUmsl9pF3pVNXLFV,Natalie Trundy
@@ -3434,7 +3434,7 @@ actor_id,actor_name
 7wJxshUBRL3HJLNJvO1ADqQaLT,Nancy Allen
 7wPPKi7djQfNc9NLVJvhBmoZ26U,Stanley Tucci
 7xEVIVIizaKG624qheOpCz3I4YE,Anastasia Hille
-7xJrQd0ohjix5lnAcoFbvkJInI,Scott Carrot Top Thompson
+7xJrQd0ohjix5lnAcoFbvkJInI,"Scott ""Carrot Top"" Thompson"
 7xtODH491pxmdaevqYo4SNKbdOr,Morris Chestnut
 7y56zQpHkbGQ4QPTv7tdOSpcpe5,Natalie Imbruglia
 7y7GQ1xB4I0imsQWXnuEDDpqhdA,Dolores Gray
@@ -5804,7 +5804,7 @@ g1rRFVloFMOkxaIvj8Ja1CliTkP,John Le Mesurier
 g1w12nNH8p9Fm5dGZmYc9GecPcg,Earl Rowe
 g2HeXDVqtGhYKBqeV4cFaZ7RbVV,Charles Rocket
 g2YkF3PWSJU1vTKuURBH0DOMblm,Julian Arahanga
-g30YwBCefnlIBXnvXKV3A8Z3Fly,Henry Louis Gates, Jr.
+g30YwBCefnlIBXnvXKV3A8Z3Fly,"Henry Louis Gates, Jr."
 g3byNPhN0q6VzanAPj1mJdz1s7U,Joey Richter
 g3jyAN3xKfqF21fmhZO5WL7q3v5,Son Ye-jin
 g4Q5REa6pP5AcHrhKt5k9LjAs3h,Dustin Milligan
@@ -6116,7 +6116,7 @@ hGDXJKzXGPulVmxWBxyzrTY4RT4,Jon Seda
 hGEVhE6o5xcVJjdAkJnQQXUZWAE,Laird Hamilton
 hGXgVxZCMliuHZhVTg2q2UAgrmI,Claudette Colbert
 hGil5CTnudDlDaCdvIWfGT7jsdG,Grégori Derangère
-hGuDQKlXruAglXBOf7MZNjGyzb0,Miguel A. Núñez, Jr.
+hGuDQKlXruAglXBOf7MZNjGyzb0,"Miguel A. Núñez, Jr."
 hH6mdfZQYkMZsHgPHcVvKi5kIFz,Nick Cravat
 hH93PT4yKLtrXyBVw7AF7DbCh3p,Jacqueline McKenzie
 hHSlXjohcTtjT8rjEhYMZQplZ08,Sarah Lancaster
@@ -7116,7 +7116,7 @@ l9wiXgf7kLiuxgArVVeOqgPYHrm,Jackie Coogan
 l9yEDDylyfFrSotUoobysptdpct,Philip Kwok Chun-Fung
 lA76cZ2EoE6QrN6oEGlTgrbPDdo,Guy Rolfe
 lACT0qvM73hx4W9QdMhaSWAXZEj,Lara Belmont
-lAQ9zPsdHm9JkvgB7QNMKb8Thte,Timothy Speed Levitch
+lAQ9zPsdHm9JkvgB7QNMKb8Thte,"Timothy ""Speed"" Levitch"
 lAbNw40OkoPKT39jV5O1d8PCXp4,Keisha Castle-Hughes
 lAf5CaUMTKWhM18vWzqUqiTttM4,Barbara Burska
 lAkgpA7qbyVL4Y9kFmAyefezNUY,Ann Magnuson
@@ -8454,7 +8454,7 @@ qLCzXBrdKWjCecNzozyR4CD9KBX,Honor Blackman
 qLJg0e7ObS8YDmW1UxqVo5VOJ5Y,Taylor Handley
 qLPZJ86YbnrKsM7KYoGknnB6USJ,Christine Kaufmann
 qLQfTAYvufmy3X6WI4OHrABL2ap,Zakes Mokae
-qLnfxKvvbjDRtFHDgGS1U9KC9SO,Al Freeman, Jr.
+qLnfxKvvbjDRtFHDgGS1U9KC9SO,"Al Freeman, Jr."
 qLtwbxkAC7j6m9jRqzQMoLy5f4g,Norma Aleandro
 qM2DNQ7kI9oZqAYfhzgKaGURCnm,Randolph Scott
 qMPmQyearWKLtqpeCbKdrx3S2Y2,Eloise Laurence
