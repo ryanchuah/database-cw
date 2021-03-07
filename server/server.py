@@ -16,8 +16,8 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 app = Flask(__name__)
 
 config = {
-    'user': 'root',
-    'password': 'root',
+    'user': 'user',
+    'password': 'user',
     'host': 'db',
     'port': '3306',
     'database': 'movies_db'

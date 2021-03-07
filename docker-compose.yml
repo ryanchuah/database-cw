@@ -19,6 +19,9 @@ services:
     ports:
       - "32000:3306"
     environment:
+      MYSQL_USER: user
+      MYSQL_PASSWORD: user
+      MYSQL_DATABASE: movies_db
       MYSQL_ROOT_PASSWORD: root
     # command: ["--secure-file-priv=${PWD}"]
     volumes:
