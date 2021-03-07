@@ -7,7 +7,7 @@ CREATE TABLE Movies (
   imdbId INT default -1,
   tmdbId INT default -1,
   release_year INT default -1,
-  -- poster_url VARCHAR(200),
+  poster_url VARCHAR(35),
   PRIMARY KEY (movieId)
 );
 
@@ -81,17 +81,30 @@ LINES TERMINATED BY '\n'
 IGNORE 1 LINES;
 
 
-CREATE TABLE Actors (
-  actorId INT not null,
-  actorName VARCHAR(100) not null,
-  PRIMARY KEY (actorId)
-);
+-- CREATE TABLE Actors (
+--   actorId VARCHAR(40) not null,
+--   actorName VARCHAR(255) not null,
+--   PRIMARY KEY (actorId)
+-- );
 
-CREATE TABLE Actor_Roles (
-  actorId INT not null,
-  movieId INT not null,
-  PRIMARY KEY (actorId, movieId),
-  FOREIGN KEY (movieId) REFERENCES Movies(movieId),
-  FOREIGN KEY (actorId) REFERENCES Actors(actorId)
-);
+-- LOAD DATA INFILE '/var/lib/mysql-files/datasets/Actors.csv'
+-- INTO TABLE Actors
+-- FIELDS TERMINATED BY ','
+-- ENCLOSED BY '"'
+-- LINES TERMINATED BY '\n'
+-- IGNORE 1 LINES;
 
+-- CREATE TABLE Actor_Roles (
+--   actorId VARCHAR(40) not null,
+--   movieId INT not null,
+--   PRIMARY KEY (actorId, movieId),
+--   FOREIGN KEY (movieId) REFERENCES Movies(movieId),
+--   FOREIGN KEY (actorId) REFERENCES Actors(actorId)
+-- );
+
+-- LOAD DATA INFILE '/var/lib/mysql-files/datasets/Actor_Roles.csv'
+-- INTO TABLE Tags
+-- FIELDS TERMINATED BY ','
+-- ENCLOSED BY '"'
+-- LINES TERMINATED BY '\n'
+-- IGNORE 1 LINES;

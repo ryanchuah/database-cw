@@ -18604,9 +18604,6 @@ movieId,genres
 101973,Drama
 101973,Thriller
 102007,Animation
-102025,Children
-102025,Horror
-102025,Sci-Fi
 102033,Action
 102033,Comedy
 102033,Crime
@@ -20799,11 +20796,6 @@ movieId,genres
 144522,Action
 144522,Horror
 144522,Thriller
-144606,Comedy
-144606,Crime
-144606,Drama
-144606,Romance
-144606,Thriller
 144620,Adventure
 144620,Comedy
 144620,Horror
@@ -20864,8 +20856,6 @@ movieId,genres
 146730,Drama
 146730,Thriller
 146986,Comedy
-147002,Drama
-147002,Romance
 147142,Children
 147142,Comedy
 147196,Comedy
@@ -21515,8 +21505,6 @@ movieId,genres
 168326,Comedy
 168326,Romance
 168350,Drama
-168358,Sci-Fi
-168358,Thriller
 168366,Fantasy
 168366,Romance
 168418,Animation
