@@ -280,13 +280,12 @@ def predict_ratings():
         userId = response[0]
         tags = response[1]
         rating = response[2]
-
+        condition = create_condition(tags, col='Tags.tag')
         #get predicted rating from tags
-        for tag in tags:
             holders = tag,
-            tags_average_command = '''SELECT avg(Rating) as average_rating
+            tags_average_command = f'''SELECT avg(Rating) as average_rating
                                 FROM Rating, Tags
-                                WHERE Rating.movieId = Tag.MovieId AND Tags.tag = %s'''
+                                WHERE Rating.movieId = Tag.MovieId AND {condition}'''
             tag_sum += int(query(tags_average_command, holders, tags_average_result()))
             tag_count += 1
 
@@ -420,8 +419,31 @@ def get_users_with_tags(condition, tags):
     command = f''' SELECT count(Distinct Tags.userId)
                   FROM Tags
                   WHERE {condition}'''
-    return query(command, tags, lambda cursor: cursor.fetchone()[0])          
+    return query(command, tags, lambda cursor: cursor.fetchone()[0])
 
+@app.route("/predict_personality")
+def predict_personality():
+    tags = tuple(request.args.getlist('tags'))
+    condition = create_condition(tags, col='Tags.tag')
+    command = f'''SELECT avg(openness) as avg_openness, avg(agreeableness) as avg_agreeableness, avg(emotional_stability) as avg_emotional_stability, avg(conscientiousness) as conscientiousness, avg(extraversion) as extraversion
+                    FROM Personality_Attributes_table, Personality_Ratings_table, Tags
+                    WHERE Personality_Attributes_table.userId = Personality_Ratings_table.hashed_userId
+                        AND Personality_Ratings_table.predicted_rating > 4.5
+                        AND Personality_Ratings_table.movieId IN (SELECT movieId FROM Tags WHERE {condition})'''
+
+
+    # command = f'''SELECT avg(openness) as avg_openness, avg(agreeableness) as avg_agreeableness, avg(emotional_stability) as avg_emotional_stability, avg(conscientiousness) as conscientiousness, avg(extraversion) as extraversion
+    #                 FROM Personality_Attributes_table, Personality_Ratings_table, Tags
+    #                 WHERE Personality_Attributes_table.userId = Personality_Ratings_table.hashed_userId
+    #                     AND Personality_Ratings_table.predicted_rating > 4.5
+    #                     AND {condition}
+    #                     AND Personality_Ratings_table.movieId IN (SELECT movieId FROM Tags)'''
+    return {"tags" : query(command, tags, predict_personality_result)}
+
+def predict_personality_result(cursor):
+    return [{"openness": avg_openness, "agreeableness": avg_agreeableness, "emotional_stability": avg_emotional_stability, "conscientiousness": avg_conscientiousness, "extraversion": avg_extraversion}
+            for avg_openness, avg_agreeableness, avg_emotional_stability, avg_conscientiousness, avg_extraversion in cursor]
+         
 def create_condition(genres, col='Genres.genres'):
     if not len(genres):return "FALSE"
     result = '('
