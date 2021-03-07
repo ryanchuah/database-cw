@@ -266,6 +266,45 @@ def get_tagged_genres():
     return {'similar_genres': tagged_genres(nUsers, condition, tags), "tags": tags_dict}
 
 
+@app.route("/predict_rating")
+def predict_ratings():
+    # get tags from front end
+    responses = request.args.getlist('responses')
+
+    tag_sum = 0
+    tag_count = 0
+    rating_sum = 0
+    rating_count = 0
+
+    for response in responses:
+        userId = response[0]
+        tags = response[1]
+        rating = response[2]
+
+        #get predicted rating from tags
+        for tag in tags:
+            holders = tag,
+            tags_average_command = '''SELECT avg(Rating) as average_rating
+                                FROM Rating, Tags
+                                WHERE Rating.movieId = Tag.MovieId AND Tags.tag = %s'''
+            tag_sum += int(query(tags_average_command, holders, tags_average_result()))
+            tag_count += 1
+
+        #find other movies with same rating from user x and and average their rating - average those
+        holders = userId, rating,
+        user_rating_average_command = '''SELECT avg(Rating) as average_rating
+                            FROM Rating
+                            WHERE Rating.userId = %s and Rating.rating = %s'''
+        rating_sum += int(query(user_rating_average_command, holders, user_rating_average_result()))
+        rating_count += 1
+
+
+    average_rating = (tag_sum + rating_sum) / (tag_count + rating_count)
+
+    return {'average rating': average_rating}
+
+
+
 def query(command, holders, get_result):
     result = None
     try:
@@ -319,6 +358,14 @@ def ratings_date_movie_result(cursor):
 def ratings_percentage_movie_result(cursor):
     return [{"rating": rating, "occurence": occurence}
             for rating, occurence in cursor]
+
+def tags_average_result(cursor):
+    return [{"average_rating": average_rating}
+            for average_rating, occurence in cursor]
+
+def user_rating_average_result(cursor):
+    return [{"average_rating": average_rating}
+            for average_rating, occurence in cursor]
 
 
 def similar_genres(nUsers, condition, genres):
