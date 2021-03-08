@@ -282,12 +282,12 @@ def predict_ratings():
         rating = response[2]
         condition = create_condition(tags, col='Tags.tag')
         #get predicted rating from tags
-            holders = tag,
-            tags_average_command = f'''SELECT avg(Rating) as average_rating
-                                FROM Rating, Tags
-                                WHERE Rating.movieId = Tag.MovieId AND {condition}'''
-            tag_sum += int(query(tags_average_command, holders, tags_average_result()))
-            tag_count += 1
+        holders = tags,
+        tags_average_command = f'''SELECT avg(Rating) as average_rating
+                            FROM Rating, Tags
+                            WHERE Rating.movieId = Tag.MovieId AND {condition}'''
+        tag_sum += int(query(tags_average_command, holders, tags_average_result()))
+        tag_count += 1
 
         #find other movies with same rating from user x and and average their rating - average those
         holders = userId, rating,
