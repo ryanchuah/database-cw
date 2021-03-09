@@ -249,9 +249,9 @@ def get_similar_genres():
 # Returns a list of genres [a, b...] each associated with a proportion
 # of users that have used this movie's tags and like that genre.
 # Also returns this movie's tags
-#Can display 'd% of users that used tags x,y,z also like genre a'
+# Can display 'd% of users that used tags x,y,z also like genre a'
 #            'c% of users that used tags x,y,z also like genre b' etc..
-#Example: http://localhost:5000/similar_tags?movieId=1
+# Example: http://localhost:5000/similar_tags?movieId=1
 @app.route("/similar_tags")
 def get_tagged_genres():
     movieId = int(request.args.get('movieId', type=int))
