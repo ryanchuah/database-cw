@@ -75,101 +75,105 @@ def single_movie(movie_id):
     # return "individual movie page data will be returned here for movieid: "+movie_id
     return movie_details
 
+# PARAMS:
+# sortBy can only take ==> ['movieId', 'title', 'release_year', 'popularity', 'votes', 'avg_ratings', 'polarity_index']
+# mostToLeast ==> 1 or 0. 1 being descending order
+# EXAMPLE: http://localhost:5000/movies?sortBy=release_year&limit=10&page=1&mostToLeast=0
+# @app.route("/movies")
 @app.route('/movies')
 @cross_origin()
 def movies():
+    limit, page, sortBy, mostToLeast = validate_input()
+    return get_sorted_by_column(limit, page, sortBy, mostToLeast)
 
+def validate_input():
     sortBy = request.args.get('sortBy')
-    limit = request.args.get('limit')
-    page = request.args.get('page')
-    limit = int(limit)
-    page = int(page)
-    print(sortBy)
-    if sortBy == 'popularity':
-        return get_most_popular(limit, page)
-    elif sortBy == 'polarity':
-        return get_most_polarising(limit, page)
-    elif sortBy == 'column':
-        column = request.args.get('column')
-        return get_sorted_by_column(limit, page, column)
-    else:
-        print("sortBy= ", sortBy + " not recognized")
-
-# returns the start_th to the end_th most popular movies inclusive
-# requirements => start and end are both ints, start <= end, start >= 1 and end >= 1
-# EXAMPLE: http://0.0.0.0:5000/popular?start=1&end=10
-# @app.route("/popular")
-
-
-def get_most_popular(limit, page):
-    start = limit * page - (limit-1)
-    end = limit * page
-    holders = end - start + 1, start - 1
-    command = '''SELECT Movies.movieId, Movies.title, Movies.release_year, Sum(Ratings.rating) as total_ratings, 
-                 Count(Ratings.rating) as votes, Avg(Ratings.rating) as avg_ratings 
-                 FROM Ratings, Movies 
-                 WHERE Ratings.movieId = Movies.movieId 
-                 GROUP BY Ratings.movieId 
-                 ORDER BY total_ratings DESC 
-                 LIMIT %s OFFSET %s'''
-    return {'movies': query(command, holders, popularity_result)}
-
-# returns the start_th to the end_th most polar movies inclusive
-# requirements => start and end are both ints, start <= end, start >= 1 and end >= 1
-# EXAMPLE: http://0.0.0.0:5000/polarity?start=1&end=10
-
-
-def get_most_polarising(limit, page):
-    start = limit * page - (limit-1)
-    end = limit * page
-    holders = end - start + 1, start - 1
-    command = '''SELECT Movies.movieId, Movies.title, Movies.release_year, 
-                 VARIANCE(Ratings.rating) as polarity_index 
-                 FROM Ratings, Movies 
-                 WHERE Ratings.movieId = Movies.movieId 
-                 GROUP BY Ratings.movieId 
-                 ORDER BY polarity_index DESC 
-                 LIMIT %s OFFSET %s'''
-    return {'movies': query(command, holders, polarity_result)}
-
-
-def get_sorted_by_column(limit, page, column):
-    Movies_columns = ['movieId', 'title', 'imdbId', 'tmdbId']
-
-    if column not in Movies_columns:
-        column = None
+    mostToLeast = int(request.args.get('mostToLeast'))
+    limit = int(request.args.get('limit'))
+    page = int(request.args.get('page'))
+    Movies_columns = ['movieId', 'title', 'release_year', 'popularity', 'votes', 'avg_ratings', 'polarity_index']
+    if sortBy not in Movies_columns:
         raise ValueError(
-            f"the request query column={column} is not recognized. Either developer error, or SQL injection attempt")
+            f"the request query column={sortBy} is not recognized. Either developer error, or SQL injection attempt")
+    return limit, page, sortBy, mostToLeast
 
+# returns the start_th to the end_th most/least 'sortby' movies inclusive depending on mostToLeast
+# requirements => start and end are both ints, start <= end, start >= 1 and end >= 1
+def get_sorted_by_column(limit, page, sortBy='popularity', mostToLeast=1):
     start = limit * page - (limit-1)
     end = limit * page
-
-    try:
-        connection = mysql.connector.connect(**config)
-        cursor = connection.cursor()
-        query = '''SELECT Movies.movieId, Movies.title, Movies.release_year, Sum(Ratings.rating) as total_ratings, 
-                 Count(Ratings.rating) as votes, Avg(Ratings.rating) as avg_ratings 
+    holders = end - start + 1, start - 1
+    ordering = 'DESC' if mostToLeast else 'ASC'
+    command = f'''SELECT Movies.movieId as movieId, Movies.title as title, Movies.release_year as release_year, Sum(Ratings.rating) as popularity, 
+                 Count(Ratings.rating) as votes, Avg(Ratings.rating) as avg_ratings, VARIANCE(Ratings.rating) as polarity_index 
                  FROM Ratings, Movies 
                  WHERE Ratings.movieId = Movies.movieId 
                  GROUP BY Ratings.movieId 
-                 ORDER BY ''' + column + ' ASC LIMIT %s OFFSET %s'
-        cursor.execute(query, (end - start + 1, start - 1))
+                 ORDER BY {sortBy} {ordering} 
+                 LIMIT %s OFFSET %s'''
+    return {'movies': query(command, holders, get_sorted_result)}
 
-        movies = [{"movieId": movieId, "title": title, "release_year": release_year, "votes": votes, "avg_ratings": round(avg_ratings, 2)}
-                  for movieId, title, release_year, total_ratings, votes, avg_ratings in cursor]
+# def get_most_polarising(limit, page):
+#     start = limit * page - (limit-1)
+#     end = limit * page
+#     holders = end - start + 1, start - 1
+#     command = '''SELECT Movies.movieId, Movies.title, Movies.release_year, 
+#                  VARIANCE(Ratings.rating) as polarity_index 
+#                  FROM Ratings, Movies 
+#                  WHERE Ratings.movieId = Movies.movieId 
+#                  GROUP BY Ratings.movieId 
+#                  ORDER BY polarity_index DESC 
+#                  LIMIT %s OFFSET %s'''
+#     return {'movies': query(command, holders, polarity_result)}
 
-        cursor.close()
-        return {"movies": movies}
-    except mysql.connector.Error as err:
-        if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
-            print("Something is wrong with your user name or password")
-        elif err.errno == errorcode.ER_BAD_DB_ERROR:
-            print("Database does not exist")
-        else:
-            print(err)
-    finally:
-        cursor.close()
-        connection.close()
+def get_sorted_result(cursor):
+    return [{"movieId": movieId, "title": title, "release_year": release_year, "popularity" : popularity, 
+            "votes": votes, "avg_ratings": round(avg_ratings, 2), "polarity_index" : polarity_index}
+            for movieId, title, release_year, popularity, votes, avg_ratings, polarity_index in cursor]
+
+
+# def polarity_result(cursor):
+#     return [{"movieId": movieId, "title": title, "release_year": release_year, "polarity_index": polarity_index}
+#             for movieId, title, release_year, polarity_index in cursor]
+
+
+# def get_sorted_by_column(limit, page, column):
+#     Movies_columns = ['movieId', 'title', 'imdbId', 'tmdbId']
+
+#     if column not in Movies_columns:
+#         column = None
+#         raise ValueError(
+#             f"the request query column={column} is not recognized. Either developer error, or SQL injection attempt")
+
+#     start = limit * page - (limit-1)
+#     end = limit * page
+
+#     try:
+#         connection = mysql.connector.connect(**config)
+#         cursor = connection.cursor()
+#         query = '''SELECT Movies.movieId, Movies.title, Movies.release_year, Sum(Ratings.rating) as total_ratings, 
+#                  Count(Ratings.rating) as votes, Avg(Ratings.rating) as avg_ratings 
+#                  FROM Ratings, Movies 
+#                  WHERE Ratings.movieId = Movies.movieId 
+#                  GROUP BY Ratings.movieId 
+#                  ORDER BY ''' + column + ' ASC LIMIT %s OFFSET %s'
+#         cursor.execute(query, (end - start + 1, start - 1))
+
+#         movies = [{"movieId": movieId, "title": title, "release_year": release_year, "votes": votes, "avg_ratings": round(avg_ratings, 2)}
+#                   for movieId, title, release_year, total_ratings, votes, avg_ratings in cursor]
+
+#         cursor.close()
+#         return {"movies": movies}
+#     except mysql.connector.Error as err:
+#         if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+#             print("Something is wrong with your user name or password")
+#         elif err.errno == errorcode.ER_BAD_DB_ERROR:
+#             print("Database does not exist")
+#         else:
+#             print(err)
+#     finally:
+#         cursor.close()
+#         connection.close()
 
 
 @app.route("/search")
@@ -278,16 +282,15 @@ def predict_ratings():
 
     for response in responses:
         userId = response[0]
-        tags = response[1]
+        tags = tuple(response[1])
         rating = response[2]
         condition = create_condition(tags, col='Tags.tag')
         #get predicted rating from tags
-            holders = tag,
-            tags_average_command = f'''SELECT avg(Rating) as average_rating
-                                FROM Rating, Tags
-                                WHERE Rating.movieId = Tag.MovieId AND {condition}'''
-            tag_sum += int(query(tags_average_command, holders, tags_average_result()))
-            tag_count += 1
+        tags_average_command = f'''SELECT avg(Rating) as average_rating
+                            FROM Rating, Tags
+                            WHERE Rating.movieId = Tag.MovieId AND {condition}'''
+        tag_sum += int(query(tags_average_command, tags, tags_average_result()))
+        tag_count += 1
 
         #find other movies with same rating from user x and and average their rating - average those
         holders = userId, rating,
@@ -323,14 +326,14 @@ def extract_genres(cursor):
     return [{"genres": genres, "proportion": float(proportion)} for genres, proportion in cursor]
 
 
-def popularity_result(cursor):
-    return [{"movieId": movieId, "title": title, "release_year": release_year, "votes": votes, "avg_ratings": round(avg_ratings, 2)}
-            for movieId, title, release_year, total_ratings, votes, avg_ratings in cursor]
+# def popularity_result(cursor):
+#     return [{"movieId": movieId, "title": title, "release_year": release_year, "votes": votes, "avg_ratings": round(avg_ratings, 2)}
+#             for movieId, title, release_year, total_ratings, votes, avg_ratings in cursor]
 
 
-def polarity_result(cursor):
-    return [{"movieId": movieId, "title": title, "release_year": release_year, "polarity_index": polarity_index}
-            for movieId, title, release_year, polarity_index in cursor]
+# def polarity_result(cursor):
+#     return [{"movieId": movieId, "title": title, "release_year": release_year, "polarity_index": polarity_index}
+#             for movieId, title, release_year, polarity_index in cursor]
 
 
 def individual_movie_result(cursor):
