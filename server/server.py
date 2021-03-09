@@ -77,33 +77,33 @@ def single_movie(movie_id):
 
 # PARAMS:
 # sortBy can only take ==> ['movieId', 'title', 'release_year', 'popularity', 'votes', 'avg_ratings', 'polarity_index']
-# mostToLeast ==> 1 or 0. 1 being descending order
-# EXAMPLE: http://localhost:5000/movies?sortBy=release_year&limit=10&page=1&mostToLeast=0
+# ascending ==> 1 or 0. 1 being descending order
+# EXAMPLE: http://localhost:5000/movies?sortBy=release_year&limit=10&page=1&ascending=0
 # @app.route("/movies")
 @app.route('/movies')
 @cross_origin()
 def movies():
-    limit, page, sortBy, mostToLeast = validate_input()
-    return get_sorted_by_column(limit, page, sortBy, mostToLeast)
+    limit, page, sortBy, ascending = validate_input()
+    return get_sorted_by_column(limit, page, sortBy, ascending)
 
 def validate_input():
     sortBy = request.args.get('sortBy')
-    mostToLeast = int(request.args.get('mostToLeast'))
+    ascending = int(request.args.get('ascending'))
     limit = int(request.args.get('limit'))
     page = int(request.args.get('page'))
     Movies_columns = ['movieId', 'title', 'release_year', 'popularity', 'votes', 'avg_ratings', 'polarity_index']
     if sortBy not in Movies_columns:
         raise ValueError(
             f"the request query column={sortBy} is not recognized. Either developer error, or SQL injection attempt")
-    return limit, page, sortBy, mostToLeast
+    return limit, page, sortBy, ascending
 
-# returns the start_th to the end_th most/least 'sortby' movies inclusive depending on mostToLeast
+# returns the start_th to the end_th most/least 'sortby' movies inclusive depending on ascending
 # requirements => start and end are both ints, start <= end, start >= 1 and end >= 1
-def get_sorted_by_column(limit, page, sortBy='popularity', mostToLeast=1):
+def get_sorted_by_column(limit, page, sortBy='popularity', ascending=1):
     start = limit * page - (limit-1)
     end = limit * page
     holders = end - start + 1, start - 1
-    ordering = 'DESC' if mostToLeast else 'ASC'
+    ordering = 'DESC' if ascending else 'ASC'
     command = f'''SELECT Movies.movieId as movieId, Movies.title as title, Movies.release_year as release_year, Sum(Ratings.rating) as popularity, 
                  Count(Ratings.rating) as votes, Avg(Ratings.rating) as avg_ratings, VARIANCE(Ratings.rating) as polarity_index 
                  FROM Ratings, Movies 
