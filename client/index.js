@@ -1,3 +1,5 @@
+const rootUrl = "http://localhost:5000";
+
 // HTML "Sort By" element
 const sortByElement = document.getElementById("sortBy");
 
@@ -14,7 +16,7 @@ sortByElement.onchange = function () {
 	window.localStorage.setItem("sortByValue", JSON.stringify(sortByValue));
 };
 
-async function updateDisplay(sortByValue, limit, page, column) {
+async function updateDisplay(sortByValue, limit, page) {
 	// most calls to updateDisplay will be through updatePage()
 	// updatePage() handles sets sortByValue and limit to non-null/non-undefined values, so
 	// sortByValue and limit will never be undefined
@@ -23,16 +25,15 @@ async function updateDisplay(sortByValue, limit, page, column) {
 	moviesTableBody.innerHTML = "";
 
 	let url =
-		"http://localhost:5000/movies?limit=" +
+		`${rootUrl}/movies?limit=` +
 		limit +
 		"&sortBy=" +
 		sortByValue +
 		"&page=" +
-		page;
+		page +
+		"&ascending=" +
+		0;
 
-	if (column) {
-		url += "&column=" + column;
-	}
 	console.log(url);
 
 	const response = await fetch(url);
@@ -49,26 +50,13 @@ async function updateDisplay(sortByValue, limit, page, column) {
 		for (const movie of data.movies) {
 			let tr = document.createElement("tr");
 
-			let movieId = document.createElement("td");
-			movieId.innerHTML = movie.movieId;
-
-			let title = document.createElement("td");
-			title.innerHTML = movie.title;
-
-			let release_year = document.createElement("td");
-			release_year.innerHTML = movie.release_year;
-
-			let avg_ratings = document.createElement("td");
-			avg_ratings.innerHTML = movie.avg_ratings;
-
-			let votes = document.createElement("td");
-			votes.innerHTML = movie.votes;
-
-			tr.appendChild(movieId);
-			tr.appendChild(title);
-			tr.appendChild(release_year);
-			tr.appendChild(avg_ratings);
-			tr.appendChild(votes);
+			tr.innerHTML = `
+			<td>${movie.movieId}</td>
+			<td><a href="movies/movie.html?movieId=${movie.movieId}">${movie.title}</a></td>
+			<td>${movie.release_year}</td>
+			<td>${movie.avg_ratings}</td>
+			<td>${movie.votes}</td>
+			`;
 			moviesTableBody.appendChild(tr);
 		}
 	}
@@ -165,16 +153,16 @@ function updatePage(sortByValue, limit, page) {
 		page = 1;
 	}
 
-	let column;
-	if (sortByValue != "polarity" && sortByValue != "popularity") {
-		console.log("HERE");
+	// let column;
+	// if (sortByValue != "polarity" && sortByValue != "popularity") {
+	// 	console.log("HERE");
 
-		// means we are sorting by column name
-		column = sortByValue;
-		sortByValue = "column";
-	}
+	// 	// means we are sorting by column name
+	// 	column = sortByValue;
+	// 	sortByValue = "column";
+	// }
 
-	updateDisplay(sortByValue, limit, page, column);
+	updateDisplay(sortByValue, limit, page);
 	updatePagination(page);
 }
 
