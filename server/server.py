@@ -25,6 +25,7 @@ config = {
 
 
 @app.route('/movies/<movie_id>')
+@cross_origin()
 def single_movie(movie_id):
     holders = movie_id,
     details_command = '''SELECT Movies.title, Movies.release_year, Movies.poster_url, Avg(Ratings.rating) as avg_ratings
@@ -80,8 +81,8 @@ def single_movie(movie_id):
 # PARAM: a movieId
 # Returns a list of genres [a, b...] each associated with a proportion
 # of users that like this movie and that genre
-# Can display 'd% of users that like Toy story also like genre a'
-#             'c% of users that like avengers also like genere b' etc..
+# Can display 'd% of users that like (animation and adventure) also like genre a'
+#             'c% of users that like (action and thiller) also like genere b' etc..
 def get_similar_rated_genres(genres):
     condition = create_condition(genres)
     nUsers = get_nUsers(condition, genres)
@@ -92,8 +93,8 @@ def get_similar_rated_genres(genres):
 # Returns a list of genres [a, b...] each associated with a proportion
 # of users that have used this movie's tags and like that genre.
 # Also returns this movie's tags
-# Can display 'd% of users that used tags x,y,z also like genre a'
-#            'c% of users that used tags x,y,z also like genre b' etc..
+# Can display 'd% of users that used tags x,y,z and like this movie also like genre a'
+#            'c% of users that used tags x,y,z and like this movie also like genre b' etc..
 def get_similar_tagged_genres(tags_dict):
     tags = [element['tag'] for element in tags_dict]
     condition = create_condition(tags, col='Tags.tag')
