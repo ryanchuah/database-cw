@@ -25,11 +25,9 @@ config = {
 
 
 @app.route('/movies/<movie_id>')
-@cross_origin()
 def single_movie(movie_id):
-    #TODO: Add in poster and language and actors when tavles created
     holders = movie_id,
-    details_command = '''SELECT Movies.title, Movies.release_year, Avg(Ratings.rating) as avg_ratings
+    details_command = '''SELECT Movies.title, Movies.release_year, Movies.poster_url, Avg(Ratings.rating) as avg_ratings
                  FROM Ratings, Movies
                  WHERE Movies.movieId = %s AND Ratings.movieId = Movies.movieId
                  '''
@@ -69,11 +67,56 @@ def single_movie(movie_id):
                      'actors': query(actors_command, holders, actors_movie_result),
                      'tags': query(tags_command, holders, tags_movie_result),
                      'ratings_date': query(ratings_date_command, holders, ratings_date_movie_result),
-                     'ratings_percentage': query(ratings_percentage_command, holders, ratings_percentage_movie_result)}
+                     'ratings_percentage': query(ratings_percentage_command, holders, ratings_percentage_movie_result),
+                     'similar_genres_by_genre':get_similar_genres(movie_id),
+                     'similar_genres_by_tag':get_tagged_genres(movie_id)
+                      }
 
     # print(movie_details)
     # return "individual movie page data will be returned here for movieid: "+movie_id
     return movie_details
+
+
+
+
+# PARAM: a movieId
+# Returns a list of genres [a, b...] each associated with a proportion
+# of users that like this movie and that genre
+# Can display 'd% of users that like Toy story also like genre a'
+#             'c% of users that like avengers also like genere b' etc..
+#EXAMPLE: http://localhost:5000/similar_genres?movieId=3
+def get_similar_genres(movieId):
+    if not movieId: abort(400, 'Please use \'movieId\' as param')
+    genre_command = '''SELECT genres FROM Genres WHERE Genres.movieId = %s'''
+    holders = movieId,
+    genres = query(genre_command, holders, genres_movie_result)
+    if not genres: return {'similar_genres' : 'no genres'}
+    condition = create_condition(genres)
+    nUsers = get_nUsers(condition, genres)
+    return similar_genres(nUsers, condition, genres)
+
+
+# PARAM: a movieId
+# Returns a list of genres [a, b...] each associated with a proportion
+# of users that have used this movie's tags and like that genre.
+# Also returns this movie's tags
+#Can display 'd% of users that used tags x,y,z also like genre a'
+#            'c% of users that used tags x,y,z also like genre b' etc..
+#Example: http://localhost:5000/similar_tags?movieId=1
+def get_tagged_genres(movieId):
+    if not movieId: abort(400, 'Please use \'movieId\' as param')
+    tags_command = '''SELECT tag, COUNT(tag) AS occurence
+                      FROM Tags
+                      WHERE Tags.movieId = %s
+                      GROUP BY tag
+                      ORDER BY occurence DESC
+                      '''
+    holders = movieId,
+    tags_dict = query(tags_command, holders, tags_movie_result)
+    tags = [element['tag'] for element in tags_dict]
+    condition = create_condition(tags, col='Tags.tag')
+    nUsers = get_users_with_tags(condition, tags)
+    return tagged_genres(nUsers, condition)
 
 # PARAMS:
 # sortBy can only take ==> ['movieId', 'title', 'release_year', 'popularity', 'votes', 'avg_ratings', 'polarity_index']
@@ -117,12 +160,12 @@ def get_sorted_by_column(limit, page, sortBy='popularity', ascending=1):
 #     start = limit * page - (limit-1)
 #     end = limit * page
 #     holders = end - start + 1, start - 1
-#     command = '''SELECT Movies.movieId, Movies.title, Movies.release_year, 
-#                  VARIANCE(Ratings.rating) as polarity_index 
-#                  FROM Ratings, Movies 
-#                  WHERE Ratings.movieId = Movies.movieId 
-#                  GROUP BY Ratings.movieId 
-#                  ORDER BY polarity_index DESC 
+#     command = '''SELECT Movies.movieId, Movies.title, Movies.release_year,
+#                  VARIANCE(Ratings.rating) as polarity_index
+#                  FROM Ratings, Movies
+#                  WHERE Ratings.movieId = Movies.movieId
+#                  GROUP BY Ratings.movieId
+#                  ORDER BY polarity_index DESC
 #                  LIMIT %s OFFSET %s'''
 #     return {'movies': query(command, holders, polarity_result)}
 
@@ -130,50 +173,6 @@ def get_sorted_result(cursor):
     return [{"movieId": movieId, "title": title, "release_year": release_year, "popularity" : popularity, 
             "votes": votes, "avg_ratings": round(avg_ratings, 2), "polarity_index" : polarity_index}
             for movieId, title, release_year, popularity, votes, avg_ratings, polarity_index in cursor]
-
-
-# def polarity_result(cursor):
-#     return [{"movieId": movieId, "title": title, "release_year": release_year, "polarity_index": polarity_index}
-#             for movieId, title, release_year, polarity_index in cursor]
-
-
-# def get_sorted_by_column(limit, page, column):
-#     Movies_columns = ['movieId', 'title', 'imdbId', 'tmdbId']
-
-#     if column not in Movies_columns:
-#         column = None
-#         raise ValueError(
-#             f"the request query column={column} is not recognized. Either developer error, or SQL injection attempt")
-
-#     start = limit * page - (limit-1)
-#     end = limit * page
-
-#     try:
-#         connection = mysql.connector.connect(**config)
-#         cursor = connection.cursor()
-#         query = '''SELECT Movies.movieId, Movies.title, Movies.release_year, Sum(Ratings.rating) as total_ratings, 
-#                  Count(Ratings.rating) as votes, Avg(Ratings.rating) as avg_ratings 
-#                  FROM Ratings, Movies 
-#                  WHERE Ratings.movieId = Movies.movieId 
-#                  GROUP BY Ratings.movieId 
-#                  ORDER BY ''' + column + ' ASC LIMIT %s OFFSET %s'
-#         cursor.execute(query, (end - start + 1, start - 1))
-
-#         movies = [{"movieId": movieId, "title": title, "release_year": release_year, "votes": votes, "avg_ratings": round(avg_ratings, 2)}
-#                   for movieId, title, release_year, total_ratings, votes, avg_ratings in cursor]
-
-#         cursor.close()
-#         return {"movies": movies}
-#     except mysql.connector.Error as err:
-#         if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
-#             print("Something is wrong with your user name or password")
-#         elif err.errno == errorcode.ER_BAD_DB_ERROR:
-#             print("Database does not exist")
-#         else:
-#             print(err)
-#     finally:
-#         cursor.close()
-#         connection.close()
 
 
 @app.route("/search")
@@ -225,49 +224,6 @@ def search_movies():
         cursor.close()
         connection.close()
 
-
-# PARAM: a movieId
-# Returns a list of genres [a, b...] each associated with a proportion
-# of users that like this movie and that genre
-# Can display 'd% of users that like Toy story also like genre a'
-#             'c% of users that like avengers also like genere b' etc..
-#EXAMPLE: http://localhost:5000/similar_genres?movieId=3
-@app.route("/similar_genres")
-def get_similar_genres():
-    movieId = int(request.args.get('movieId', type=int))
-    if not movieId: abort(400, 'Please use \'movieId\' as param')
-    genre_command = '''SELECT genres FROM Genres WHERE Genres.movieId = %s'''
-    holders = movieId,
-    genres = query(genre_command, holders, genres_movie_result)
-    if not genres: return {'similar_genres' : 'no genres'}
-    condition = create_condition(genres)
-    nUsers = get_nUsers(condition, genres)
-    return {'similar_genres': similar_genres(nUsers, condition, genres)}
-
-
-# PARAM: a movieId
-# Returns a list of genres [a, b...] each associated with a proportion
-# of users that have used this movie's tags and like that genre.
-# Also returns this movie's tags
-#Can display 'd% of users that used tags x,y,z also like genre a'
-#            'c% of users that used tags x,y,z also like genre b' etc..
-#Example: http://localhost:5000/similar_tags?movieId=1
-@app.route("/similar_tags")
-def get_tagged_genres():
-    movieId = int(request.args.get('movieId', type=int))
-    if not movieId: abort(400, 'Please use \'movieId\' as param')
-    tags_command = '''SELECT tag, COUNT(tag) AS occurence
-                      FROM Tags
-                      WHERE Tags.movieId = %s
-                      GROUP BY tag
-                      ORDER BY occurence DESC
-                      '''
-    holders = movieId,
-    tags_dict = query(tags_command, holders, tags_movie_result)
-    tags = [element['tag'] for element in tags_dict]
-    condition = create_condition(tags, col='Tags.tag')
-    nUsers = get_users_with_tags(condition, tags)
-    return {'similar_genres': tagged_genres(nUsers, condition, tags), "tags": tags_dict}
 
 
 @app.route("/predict_rating")
@@ -326,19 +282,9 @@ def extract_genres(cursor):
     return [{"genres": genres, "proportion": float(proportion)} for genres, proportion in cursor]
 
 
-# def popularity_result(cursor):
-#     return [{"movieId": movieId, "title": title, "release_year": release_year, "votes": votes, "avg_ratings": round(avg_ratings, 2)}
-#             for movieId, title, release_year, total_ratings, votes, avg_ratings in cursor]
-
-
-# def polarity_result(cursor):
-#     return [{"movieId": movieId, "title": title, "release_year": release_year, "polarity_index": polarity_index}
-#             for movieId, title, release_year, polarity_index in cursor]
-
-
 def individual_movie_result(cursor):
-    return [{"title": title, "release_year": release_year, "avg_rating": avg_rating}
-            for title, release_year, avg_rating in cursor]
+    return [{"title": title, "release_year": release_year, "poster_url":poster_url, "avg_rating": avg_rating}
+            for title, release_year, poster_url, avg_rating in cursor]
 
 def genres_movie_result(cursor):
     return [genre[0] for genre in cursor]
@@ -433,14 +379,6 @@ def predict_personality():
                     WHERE Personality_Attributes_table.userId = Personality_Ratings_table.hashed_userId
                         AND Personality_Ratings_table.predicted_rating > 4.5
                         AND Personality_Ratings_table.movieId IN (SELECT movieId FROM Tags WHERE {condition})'''
-
-
-    # command = f'''SELECT avg(openness) as avg_openness, avg(agreeableness) as avg_agreeableness, avg(emotional_stability) as avg_emotional_stability, avg(conscientiousness) as conscientiousness, avg(extraversion) as extraversion
-    #                 FROM Personality_Attributes_table, Personality_Ratings_table, Tags
-    #                 WHERE Personality_Attributes_table.userId = Personality_Ratings_table.hashed_userId
-    #                     AND Personality_Ratings_table.predicted_rating > 4.5
-    #                     AND {condition}
-    #                     AND Personality_Ratings_table.movieId IN (SELECT movieId FROM Tags)'''
     return {"tags" : query(command, tags, predict_personality_result)}
 
 def predict_personality_result(cursor):
