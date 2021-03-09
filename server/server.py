@@ -147,6 +147,7 @@ def get_sorted_result(cursor):
 
 
 @app.route("/search")
+@cross_origin()
 def search_movies():
     sortBy = request.args.get('sortBy')
 
@@ -198,6 +199,7 @@ def search_movies():
 
 
 @app.route("/predict_rating")
+@cross_origin()
 def predict_ratings():
     # get tags from front end
     responses = request.args.getlist('responses')
@@ -342,6 +344,7 @@ def get_users_with_tags(condition, tags):
     return query(command, tags, lambda cursor: cursor.fetchone()[0])
 
 @app.route("/predict_personality")
+@cross_origin()
 def predict_personality():
     tags = tuple(request.args.getlist('tags'))
     condition = create_condition(tags, col='Tags.tag')
