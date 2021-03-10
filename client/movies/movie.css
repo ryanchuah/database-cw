@@ -1,0 +1,13 @@
+html {
+	margin-left: 80px;
+	margin-right: 80px;
+}
+#poster {
+	width: 300px;
+	/* border: 1000px; */
+}
+
+.canvas-container {
+	width: 400px;
+	height: 400px;
+}

@@ -32,7 +32,7 @@ async function updateDisplay(sortByValue, limit, page) {
 		"&page=" +
 		page +
 		"&ascending=" +
-		0;
+		1;
 
 	console.log(url);
 
@@ -46,15 +46,18 @@ async function updateDisplay(sortByValue, limit, page) {
 		);
 	} else {
 		const data = await response.json();
-
+		let rating_val;
 		for (const movie of data.movies) {
 			let tr = document.createElement("tr");
-
+			rating_val = parseFloat(data.details[0].avg_rating);
+			rating_val = rating_val
+				? Math.round(rating_val * 2) / 2
+				: "Unknown"; //round to nearest 0.5
 			tr.innerHTML = `
 			<td>${movie.movieId}</td>
 			<td><a href="movies/movie.html?movieId=${movie.movieId}">${movie.title}</a></td>
 			<td>${movie.release_year}</td>
-			<td>${movie.avg_ratings}</td>
+			<td>${rating_val}</td>
 			<td>${movie.votes}</td>
 			`;
 			moviesTableBody.appendChild(tr);
