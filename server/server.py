@@ -187,6 +187,31 @@ def predict_personality():
     return {"tags": query(command, tags, predict_personality_result)}
 
 
+# Error routes
+@app.errorhandler(404)
+def page_not_found(e):
+    # note that we set the 404 status explicitly
+    return "404"
+
+
+@app.errorhandler(403)
+def page_not_found(e):
+    # note that we set the 404 status explicitly
+    return "403"
+
+
+@app.errorhandler(410)
+def page_not_found(e):
+    # note that we set the 404 status explicitly
+    return "410"
+
+
+@app.errorhandler(500)
+def page_not_found(e):
+    # note that we set the 404 status explicitly
+    return "500"
+
+
 # Function to run queries
 def query(command, holders, get_result):
     result = None
