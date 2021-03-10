@@ -2,7 +2,7 @@ import mysql.connector
 from flask import Flask, request, abort
 from flask_cors import CORS, cross_origin
 
-from server.query_results_templates import get_sorted_result, extract_genres, individual_movie_result, \
+from query_results_templates import get_sorted_result, extract_genres, individual_movie_result, \
     get_all_movies_result, genres_movie_result, actors_movie_result, tags_movie_result, ratings_date_movie_result, \
     ratings_percentage_movie_result, tags_average_result, user_rating_average_result, predict_personality_result
 
