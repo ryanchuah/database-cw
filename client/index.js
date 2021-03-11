@@ -68,51 +68,47 @@ async function updateDisplay(sortByValue, limit, page) {
 function updatePagination(page) {
 	// HTML "Sort By" element
 	const pagination = document.getElementById("pagination");
+	// <li class="page-item active"><a class="page-link" href="#" onclick="updatePage(null, null, 1)">${page}</a></li>
+	pagination.innerHTML = `
+	<li class="page-item"><a class="page-link" href="#" onclick="updatePage(null, null, 1)">&laquo;</a></li>
+	 <li class="page-item">
+		<a class="page-link" href="#" onclick="updatePage(null, null, ${
+			page - 1
+		})" aria-label="Previous">
+                <span aria-hidden="true"><</span>
+		</a>
+	</li>`;
+
 	if (page == 1) {
-		pagination.innerHTML = `
-        <li class="page-item">
-            <a class="page-link" href="#" onclick="updatePage(null, null, ${
-				page - 1
-			})" aria-label="Previous">
-                <span aria-hidden="true">&laquo;</span>
-            </a>
-        </li>
+		pagination.innerHTML += `
+       
         <li class="page-item active"><a class="page-link" href="#">${page}</a></li>
         <li class="page-item"><a class="page-link" href="#" onclick="updatePage(null, null, ${
 			page + 1
 		})">${page + 1}</a></li>
         <li class="page-item"><a class="page-link" href="#" onclick="updatePage(null, null, ${
 			page + 2
-		})">${page + 2}</a></li>
-        <li class="page-item">
-            <a class="page-link" href="#" onclick="updatePage(null, null, ${
-				page + 1
-			})" aria-label="Next">
-                <span aria-hidden="true">&raquo;</span>
-            </a>
-        </li>`;
+		})">${page + 2}</a></li>`;
 	} else {
-		pagination.innerHTML = `
-        <li class="page-item">
-            <a class="page-link" href="#" onclick="updatePage(null, null, ${
-				page - 1
-			})" aria-label="Previous">
-                <span aria-hidden="true">&laquo;</span>
-            </a>
-        </li>
-        <li class="page-item"><a class="page-link" href="#">${page - 1}</a></li>
+		pagination.innerHTML += `
+       
+        <li class="page-item"><a class="page-link" href="#" onclick="updatePage(null, null, ${
+			page - 1
+		})">${page - 1}</a></li>
         <li class="page-item active"><a class="page-link" href="#" onclick="updatePage(null, null, ${page})">${page}</a></li>
         <li class="page-item"><a class="page-link" href="#" onclick="updatePage(null, null, ${
 			page + 1
 		})">${page + 1}</a></li>
-        <li class="page-item">
+        `;
+	}
+	pagination.innerHTML += `
+	<li class="page-item">
             <a class="page-link" href="#" onclick="updatePage(null, null, ${
 				page + 1
 			})" aria-label="Next">
-                <span aria-hidden="true">&raquo;</span>
+                <span aria-hidden="true">></span>
             </a>
-        </li>`;
-	}
+	</li>`;
 }
 
 // this function handles the sanity check for sortByValue, limit, page before passing on to updateDisplay(..)
@@ -143,6 +139,14 @@ function updatePage(sortByValue, limit, page) {
 		window.localStorage.setItem("limit", JSON.stringify(limit));
 	}
 
+	if (!page) {
+		page = window.localStorage.getItem("page")
+			? JSON.parse(window.localStorage.getItem("page"))
+			: 1;
+	} else {
+		window.localStorage.setItem("page", JSON.stringify(page));
+	}
+
 	const pageLimitButtons = document.getElementsByClassName("page-limit-btn");
 
 	for (const btn of pageLimitButtons) {
@@ -152,9 +156,14 @@ function updatePage(sortByValue, limit, page) {
 		}
 	}
 
-	if (!page) {
-		page = 1;
-	}
+	// if (!page) {
+	// 	page = window.localStorage.getItem("page")
+	// 		? JSON.parse(window.localStorage.getItem("page"))
+	// 		: 1;
+	// }
+	// if (!page) {
+	// 	page = 1;
+	// }
 
 	// let column;
 	// if (sortByValue != "polarity" && sortByValue != "popularity") {
