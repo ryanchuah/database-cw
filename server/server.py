@@ -156,7 +156,8 @@ def predict_ratings():
         tags_average_command = f'''SELECT avg(Rating) as average_rating
                             FROM Rating, Tags
                             WHERE Rating.movieId = Tag.MovieId AND {condition}'''
-        tag_sum += int(query(tags_average_command, tags, tags_average_result()))
+        tag_sum += int(query(tags_average_command,
+                             tags, tags_average_result()))
         tag_count += 1
 
         # find other movies with same rating from user x and and average their rating - average those
@@ -164,7 +165,8 @@ def predict_ratings():
         user_rating_average_command = '''SELECT avg(Rating) as average_rating
                             FROM Rating
                             WHERE Rating.userId = %s and Rating.rating = %s'''
-        rating_sum += int(query(user_rating_average_command, holders, user_rating_average_result()))
+        rating_sum += int(query(user_rating_average_command,
+                                holders, user_rating_average_result()))
         rating_count += 1
 
     average_rating = (tag_sum + rating_sum) / (tag_count + rating_count)
@@ -191,25 +193,25 @@ def predict_personality():
 @app.errorhandler(404)
 def page_not_found(e):
     # note that we set the 404 status explicitly
-    return "404"
+    return "Page not found", 404
 
 
 @app.errorhandler(403)
 def page_not_found(e):
     # note that we set the 404 status explicitly
-    return "403"
+    return "403", 403
 
 
 @app.errorhandler(410)
 def page_not_found(e):
     # note that we set the 404 status explicitly
-    return "410"
+    return "410", 410
 
 
 @app.errorhandler(500)
 def page_not_found(e):
     # note that we set the 404 status explicitly
-    return "500"
+    return "Internal server error", 500
 
 
 # Function to run queries
@@ -234,7 +236,8 @@ def validate_input():
     ascending = int(request.args.get('ascending'))
     limit = int(request.args.get('limit'))
     page = int(request.args.get('page'))
-    Movies_columns = ['movieId', 'title', 'release_year', 'popularity', 'votes', 'avg_ratings', 'polarity_index']
+    Movies_columns = ['movieId', 'title', 'release_year',
+                      'popularity', 'votes', 'avg_ratings', 'polarity_index']
     if sortBy not in Movies_columns:
         raise ValueError(
             f"the request query column={sortBy} is not recognized. Either developer error, or SQL injection attempt")
@@ -243,7 +246,8 @@ def validate_input():
 
 # Helper function for ORing a list of values in a query
 def create_condition(columns, col='Columns.column'):
-    if not len(columns): return "FALSE"
+    if not len(columns):
+        return "FALSE"
     result = '('
     for i in range(len(columns)):
         result += f'{col} = %s'
