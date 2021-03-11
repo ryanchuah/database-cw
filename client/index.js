@@ -49,7 +49,7 @@ async function updateDisplay(sortByValue, limit, page) {
 		let rating_val;
 		for (const movie of data.movies) {
 			let tr = document.createElement("tr");
-			rating_val = parseFloat(data.details[0].avg_rating);
+			rating_val = parseFloat(data.avg_rating);
 			rating_val = rating_val
 				? Math.round(rating_val * 2) / 2
 				: "Unknown"; //round to nearest 0.5
