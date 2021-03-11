@@ -245,7 +245,7 @@ def validate_input():
 
 
 # Helper function for ORing a list of values in a query
-def create_condition(columns, col='Columns.column'):
+def create_condition(columns, col):
     if not len(columns):
         return "FALSE"
     result = '('
@@ -264,7 +264,7 @@ def create_condition(columns, col='Columns.column'):
 # Can display 'd% of users that like (animation and adventure) also like genre a'
 #             'c% of users that like (action and thiller) also like genere b' etc..
 def _get_similar_rated_genres(genres):
-    condition = create_condition(genres)
+    condition = create_condition(genres, col="Genres.genres")
     nUsers = _get_nUsers(condition, genres)
     return _similar_genres(nUsers, condition, genres)
 
