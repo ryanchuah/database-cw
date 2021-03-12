@@ -28,13 +28,6 @@ services:
       - ./db:/docker-entrypoint-initdb.d/:ro
       - ./db:/app
   
-  # nginx:
-  #   container_name: nginx
-  #   build: nginx
-  #   ports: 
-  #     - 80:80
-  #   depends_on: 
-  #     - server
   nginx:
     image: nginx:latest
     volumes:
