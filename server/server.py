@@ -186,7 +186,7 @@ def predict_personality():
                     WHERE Personality_Attributes_table.userId = Personality_Ratings_table.hashed_userId
                         AND Personality_Ratings_table.predicted_rating > 4.5
                         AND Personality_Ratings_table.movieId IN (SELECT movieId FROM Tags WHERE {condition})'''
-    return {"tags": query(command, tags, predict_personality_result)}
+    return {"personality": query(command, tags, predict_personality_result)}
 
 
 # Error routes
