@@ -1,12 +1,11 @@
 # database-cw  
-I'm doing my best
 
 ## To run:
 1. In your terminal, navigate to root directory then do  
 ```
-$ docker-compose up
+$ docker-compose up --build --scale server=n where n is the number of instances 
 ```
-2. To test the server and database, enter `http://0.0.0.0:5000/` into your browser. You should see an object of `favorite_colors`  
+2. To test the server and database, enter `http://localhost/` into your browser. You should see an object of `favorite_colors`  
 3. To test the client, open index.html in your browser. You should see a list of users and their colors.  
 
 ## To stop:
