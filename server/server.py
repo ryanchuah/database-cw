@@ -84,9 +84,11 @@ def search_movies():
 @cross_origin()
 def single_movie(movie_id):
     holders = movie_id,
+
     details_command = '''SELECT Movies.title, Movies.release_year, Movies.poster_url, Avg(Ratings.rating) as avg_ratings
                  FROM Ratings, Movies
                  WHERE Movies.movieId = %s AND Ratings.movieId = Movies.movieId
+                 GROUP BY Movies.title, Movies.release_year, Movies.poster_url
                  '''
 
     genre_command = '''SELECT genres FROM Genres WHERE Genres.movieId = %s'''
