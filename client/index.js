@@ -1,4 +1,4 @@
-const rootUrl = "http://localhost:5000";
+const rootUrl = "http://localhost";
 
 // HTML "Sort By" element
 const sortByElement = document.getElementById("sortBy");

@@ -1,4 +1,4 @@
-const rootUrl = "http://localhost:5000";
+const rootUrl = "http://localhost";
 
 const poster = document.getElementById("poster");
 const title = document.getElementById("title");
