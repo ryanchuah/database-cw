@@ -43,12 +43,12 @@ def ratings_percentage_movie_result(cursor):
 
 def tags_average_result(cursor):
     return [{"average_rating": average_rating}
-            for average_rating, occurence in cursor]
+            for average_rating in cursor]
 
 
 def user_rating_average_result(cursor):
     return [{"average_rating": average_rating}
-            for average_rating, occurence in cursor]
+            for average_rating in cursor]
 
 
 def predict_personality_result(cursor):
