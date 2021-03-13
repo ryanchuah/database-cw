@@ -1,6 +1,7 @@
 import mysql.connector
 from flask import Flask, request, abort
 from flask_cors import CORS, cross_origin
+from flask_caching import Cache
 
 from query_results_templates import get_sorted_result, extract_genres, individual_movie_result, \
     get_all_movies_result, genres_movie_result, actors_movie_result, tags_movie_result, ratings_date_movie_result, \
@@ -13,8 +14,11 @@ app = Flask(__name__)
 # this should be removed when we deploy to production servers
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
+#
+# app = Flask(__name__)
 
-app = Flask(__name__)
+cache = Cache(app, config={"CACHE_TYPE": "simple"})
+
 
 config = {
     'user': 'user',
@@ -34,6 +38,7 @@ config = {
 # sortBy can only take ==> ['movieId', 'title', 'release_year', 'popularity', 'votes', 'avg_ratings', 'polarity_index']
 # ascending ==> 1 or 0. 1 being descending order
 # EXAMPLE: http://localhost:5000/movies?sortBy=release_year&limit=10&page=1&ascending=0
+@cache.cached(timeout=3600)
 @app.route('/movies')
 @cross_origin()
 def movies():
@@ -42,6 +47,7 @@ def movies():
 
 
 # Searching for movies in the database
+@cache.cached(timeout=3600)
 @app.route("/search")
 @cross_origin()
 def search_movies():
@@ -80,6 +86,7 @@ def search_movies():
 
 # Use case 2: Searching for a film to obtain a report on viewer reaction to it
 # Use case 4: Segmenting the audience for a released movie
+@cache.cached(timeout=3600)
 @app.route('/movies/<movie_id>')
 @cross_origin()
 def single_movie(movie_id):
@@ -137,7 +144,7 @@ def single_movie(movie_id):
 
 # Use case 5: Predicting the likely viewer ratings for a soon-to-be-released film based on the tags and or ratings for
 # the film provided by a preview panel of viewers drawn from the population of viewers in the database.
-
+@cache.cached(timeout=3600)
 @app.route("/predict_rating")
 @cross_origin()
 def predict_ratings():
@@ -150,11 +157,9 @@ def predict_ratings():
     responses = [[userId, tags, rating]]
     
     tag_sum = 0
-    tag_count = 0
     rating_sum = 0
-    rating_count = 0
     total_sum = 0
-    total_count = 0
+    count = 0
     average_rating = 0
 
     for response in responses:
@@ -173,7 +178,6 @@ def predict_ratings():
         tag_score = query(tags_average_command, tags, tags_average_result)[0]['average_rating'][0]
         if tag_score:
             tag_sum += tag_score
-        tag_count += 1
 
         # find other movies with same rating from user x and and average their rating - average those
         holders = userId, float(rating),
@@ -190,20 +194,19 @@ def predict_ratings():
         user_rating_score = query(user_rating_average_command, holders, user_rating_average_result)[0]['average_rating'][0]
         if user_rating_score:
             rating_sum += user_rating_score
-        rating_count += 1
 
-        total_count += 1
+        count += 1
         total_sum += float(rating)
 
     if tag_sum != 0 and rating_sum != 0:
-        average_rating = ((tag_sum/tag_count) + (rating_sum/rating_count) + (total_sum/total_count)) / 3
+        average_rating = ((tag_sum/count) + (rating_sum/count) + (total_sum/count)) / 3
     elif tag_sum != 0:
-        average_rating = ((tag_sum/tag_count) + (total_sum/total_count)) / 2
+        average_rating = ((tag_sum/count) + (total_sum/count)) / 2
     elif rating_sum != 0:
-        average_rating = ((rating_sum/rating_count) + (total_sum/total_count)) / 2
+        average_rating = ((rating_sum/count) + (total_sum/count)) / 2
     else:
         try:
-            average_rating = total_sum/total_count
+            average_rating = total_sum/count
         except:
             average_rating = 0
 
@@ -211,6 +214,7 @@ def predict_ratings():
 
 # Use Case 6: Predicting the personality traits of viewers who will give a high rating to a soon-to-be-released film
 # whose tags are known.
+@cache.cached(timeout=3600)
 @app.route("/predict_personality")
 @cross_origin()
 def predict_personality():
