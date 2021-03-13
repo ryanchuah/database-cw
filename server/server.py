@@ -176,9 +176,8 @@ def predict_ratings():
                             FROM Ratings, Tags
                             WHERE Ratings.movieId = Tags.movieId AND {condition}'''
         tag_score = query(tags_average_command, tags, tags_average_result)[0]['average_rating'][0]
-        if tag_score:
-            tag_sum += tag_score
 
+        if tag_score:tag_sum += tag_score
         # find other movies with same rating from user x and and average their rating - average those
         holders = userId, float(rating),
 
@@ -192,8 +191,8 @@ def predict_ratings():
                 ) AS B'''
 
         user_rating_score = query(user_rating_average_command, holders, user_rating_average_result)[0]['average_rating'][0]
-        if user_rating_score:
-            rating_sum += user_rating_score
+
+        if user_rating_score:rating_sum += user_rating_score
 
         count += 1
         total_sum += float(rating)
@@ -344,7 +343,6 @@ def _similar_genres(nUsers, condition, genres):
 
 # returns the start_th to the end_th most/least 'sortby' movies inclusive depending on ascending
 # requirements => start and end are both ints, start <= end, start >= 1 and end >= 1
-## optimise this
 def _get_sorted_by_column(limit, page, sortBy='popularity', ascending=1):
     start = limit * page - (limit - 1)
     end = limit * page
@@ -359,7 +357,6 @@ def _get_sorted_by_column(limit, page, sortBy='popularity', ascending=1):
                  LIMIT %s OFFSET %s'''
     return {'movies': query(command, holders, get_sorted_result)}
 
-# optimise this
 def _get_nUsers(condition, genres):
     command = f'''SELECT  COUNT(DISTINCT Ratings.userId) as interested_user 
                   FROM Genres, Ratings, Movies 
@@ -368,7 +365,7 @@ def _get_nUsers(condition, genres):
     return query(command, genres, lambda cursor: cursor.fetchone()[0])
 
 
-# optimise this
+
 def _tagged_genres(nUsers, condition, tags):
     command = f''' SELECT genres, count(genres) / {nUsers} as proportion
                     FROM (

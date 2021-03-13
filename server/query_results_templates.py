@@ -40,14 +40,6 @@ def ratings_percentage_movie_result(cursor):
     return [{"rating": rating, "occurence": occurence}
             for rating, occurence in cursor]
 
-
-def predict_personality_result(cursor):
-    return [
-        {"openness": avg_openness, "agreeableness": avg_agreeableness, "emotional_stability": avg_emotional_stability,
-         "conscientiousness": avg_conscientiousness, "extraversion": avg_extraversion}
-        for avg_openness, avg_agreeableness, avg_emotional_stability, avg_conscientiousness, avg_extraversion in cursor]
-
-
 def tags_average_result(cursor):
     return [{"average_rating": average_rating}
         for average_rating in cursor]
@@ -56,3 +48,10 @@ def tags_average_result(cursor):
 def user_rating_average_result(cursor):
     return [{"average_rating": average_rating}
             for average_rating in cursor]
+
+def predict_personality_result(cursor):
+    return [
+        {"openness": avg_openness, "agreeableness": avg_agreeableness, "emotional_stability": avg_emotional_stability,
+         "conscientiousness": avg_conscientiousness, "extraversion": avg_extraversion}
+        for avg_openness, avg_agreeableness, avg_emotional_stability, avg_conscientiousness, avg_extraversion in cursor]
+
