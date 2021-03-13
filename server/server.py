@@ -85,7 +85,7 @@ def search_movies():
 def single_movie(movie_id):
     holders = movie_id,
 
-    details_command = '''SELECT Movies.title, Movies.release_year, Movies.poster_url, Avg(Ratings.rating) as avg_ratings
+    details_command = '''SELECT Movies.title, Movies.release_year, Movies.poster_url, Avg(Ratings.rating) as avg_rating
                  FROM Ratings, Movies
                  WHERE Movies.movieId = %s AND Ratings.movieId = Movies.movieId
                  GROUP BY Movies.title, Movies.release_year, Movies.poster_url
@@ -138,53 +138,6 @@ def single_movie(movie_id):
 # Use case 5: Predicting the likely viewer ratings for a soon-to-be-released film based on the tags and or ratings for
 # the film provided by a preview panel of viewers drawn from the population of viewers in the database.
 
-# @app.route("/predict_rating")
-# @cross_origin()
-# def predict_ratings():
-    # # get tags from front end
-    # responses = tuple(request.args.getlist('responses'))
-    #
-    # tag_sum = 0
-    # tag_count = 0
-    # rating_sum = 0
-    # rating_count = 0
-    # average_rating = 0
-    #
-    # for response in responses:
-    #     userId = response[0]
-    #     tags = tuple(response[1])
-    #     rating = response[2]
-    #     condition = create_condition(tags, col='Tags.tag')
-    #     # get predicted rating from tags
-    #     tags_average_command = f'''SELECT avg(Rating) as average_rating
-    #                         FROM Rating, Tags
-    #                         WHERE Rating.movieId = Tag.MovieId AND {condition}'''
-    #     tag_sum += int(query(tags_average_command,
-    #                          tags, tags_average_result))
-    #     tag_count += 1
-    #
-    #     # find other movies with same rating from user x and and average their rating - average those
-    #     holders = userId, rating,
-    #     user_rating_average_command = '''SELECT avg(Rating) as average_rating
-    #                         FROM Rating
-    #                         WHERE Rating.userId = %s and Rating.rating = %s'''
-    #     rating_sum += int(query(user_rating_average_command,
-    #                             holders, user_rating_average_result))
-    #     rating_count += 1
-    #
-    # if tag_count != 0 and rating_count != 0:
-    #     average_rating = (tag_sum + rating_sum) / (tag_count + rating_count)
-    # elif tag_count != 0:
-    #     average_rating = (tag_sum) / (tag_count)
-    # elif rating_count != 0:
-    #     average_rating = (rating_sum) / (rating_count)
-    # else:
-    #     # average_rating = 0
-    #     average_rating = len(responses)
-    #
-    # return {'average rating': average_rating, 'responses': responses}
-
-
 @app.route("/predict_rating")
 @cross_origin()
 def predict_ratings():
@@ -224,9 +177,16 @@ def predict_ratings():
 
         # find other movies with same rating from user x and and average their rating - average those
         holders = userId, float(rating),
-        user_rating_average_command = '''SELECT avg(rating) as average_rating
-                            FROM Ratings
-                            WHERE userId = %s AND abs(rating - %s) < 0.5'''
+
+        user_rating_average_command = '''SELECT Avg(average_rating_individuals) as average_rating
+            FROM (SELECT Avg(Ratings.rating) as average_rating_individuals
+                    FROM Ratings
+                    WHERE Ratings.movieId IN
+                        (SELECT Ratings.movieId as movie
+                            FROM Ratings WHERE (userId = %s AND abs(rating - %s) < 0.1)
+                        )
+                ) AS B'''
+
         user_rating_score = query(user_rating_average_command, holders, user_rating_average_result)[0]['average_rating'][0]
         if user_rating_score:
             rating_sum += user_rating_score
