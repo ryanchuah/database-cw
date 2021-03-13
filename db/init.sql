@@ -110,11 +110,29 @@ LINES TERMINATED BY '\n'
 IGNORE 1 LINES;
 
 
+CREATE TABLE Personality_Attributes_table (
+  hashed_userId VARCHAR(40) not null,
+  openness FLOAT,
+  agreeableness FLOAT,
+  emotional_stability FLOAT,
+  conscientiousness FLOAT,
+  extraversion FLOAT,
+  PRIMARY KEY (hashed_userId)
+);
+
+LOAD DATA INFILE '/var/lib/mysql-files/datasets/user_personalities.csv'
+INTO TABLE Personality_Attributes_table
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES;
+
 CREATE TABLE Personality_Ratings_table (
   hashed_userId VARCHAR(40) not null,
   movieId INT not null,
   predicted_rating FLOAT not null,
-  PRIMARY KEY (hashed_userId, movieId)
+  PRIMARY KEY (hashed_userId, movieId),
+  FOREIGN KEY (hashed_userId) REFERENCES Personality_Attributes_table(hashed_userId)
 );
 
 LOAD DATA INFILE '/var/lib/mysql-files/datasets/hashedUserId_movieid_ratings.csv'
@@ -124,23 +142,6 @@ ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
 IGNORE 1 LINES;
 
-
-CREATE TABLE Personality_Attributes_table (
-  userid VARCHAR(40) not null,
-  openness FLOAT,
-  agreeableness FLOAT,
-  emotional_stability FLOAT,
-  conscientiousness FLOAT,
-  extraversion FLOAT,
-  PRIMARY KEY (userid)
-);
-
-LOAD DATA INFILE '/var/lib/mysql-files/datasets/user_personalities.csv'
-INTO TABLE Personality_Attributes_table
-FIELDS TERMINATED BY ','
-ENCLOSED BY '"'
-LINES TERMINATED BY '\n'
-IGNORE 1 LINES;
 
 
 

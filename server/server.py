@@ -254,36 +254,36 @@ def predict_personality():
     tags = tuple(request.args.getlist('tags'))
     condition = create_condition(tags, col='Tags.tag')
     command = f'''SELECT avg(openness) as avg_openness, avg(agreeableness) as avg_agreeableness, avg(emotional_stability) as avg_emotional_stability, avg(conscientiousness) as conscientiousness, avg(extraversion) as extraversion
-                    FROM Personality_Attributes_table, Personality_Ratings_table, Tags
-                    WHERE Personality_Attributes_table.userId = Personality_Ratings_table.hashed_userId
-                        AND Personality_Ratings_table.predicted_rating > 4.5
-                        AND Personality_Ratings_table.movieId IN (SELECT movieId FROM Tags WHERE {condition})'''
+                    FROM Personality_Attributes_table
+                    INNER JOIN Personality_Ratings_table ON Personality_Attributes_table.hashed_userId = Personality_Ratings_table.hashed_userId
+                    INNER JOIN (SELECT movieId FROM Tags WHERE {condition}) as temp ON temp.movieId = Personality_Ratings_table.movieId
+                    WHERE Personality_Ratings_table.predicted_rating > 4.5'''
     return {"personality": query(command, tags, predict_personality_result)}
 
 
-# Error routes
-@app.errorhandler(404)
-def page_not_found(e):
-    # note that we set the 404 status explicitly
-    return "Page not found", 404
+# # Error routes
+# @app.errorhandler(404)
+# def page_not_found(e):
+#     # note that we set the 404 status explicitly
+#     return "Page not found", 404
 
 
-@app.errorhandler(403)
-def page_not_found(e):
-    # note that we set the 404 status explicitly
-    return "403", 403
+# @app.errorhandler(403)
+# def page_not_found(e):
+#     # note that we set the 404 status explicitly
+#     return "403", 403
 
 
-@app.errorhandler(410)
-def page_not_found(e):
-    # note that we set the 404 status explicitly
-    return "410", 410
+# @app.errorhandler(410)
+# def page_not_found(e):
+#     # note that we set the 404 status explicitly
+#     return "410", 410
 
 
-@app.errorhandler(500)
-def page_not_found(e):
-    # note that we set the 404 status explicitly
-    return "Internal server error", 500
+# @app.errorhandler(500)
+# def page_not_found(e):
+#     # note that we set the 404 status explicitly
+#     return "Internal server error", 500
 
 
 # Function to run queries
@@ -356,30 +356,28 @@ def _get_similar_tagged_genres(tags_dict):
 
 def _similar_genres(nUsers, condition, genres):
     having_condition = create_condition(genres, col='genres')
-    command = f'''SELECT genres, count(genres) / {nUsers} as proportion
-                FROM (SELECT  Genres.genres as genres
-                    FROM Ratings, Movies, Genres,
-                        (SELECT  DISTINCT Ratings.userId as uniqueUsers
-                        FROM Genres, Ratings, Movies
-                        WHERE Ratings.rating > 3 
-                        and Ratings.movieId = Movies.movieId
-                        and Movies.movieId = Genres.movieId
-                        and {condition}
-                        ) as userSpace
-                    WHERE Ratings.rating > 3 
-                    and userSpace.uniqueUsers = Ratings.userId
-                    and Ratings.movieId = Movies.movieId
-                    and Movies.movieId = Genres.movieId
-                    GROUP BY Ratings.userId, Genres.genres
-                    ) as genreSets
-                GROUP BY genres
-                HAVING NOT {having_condition}
-                ORDER BY proportion DESC'''
+    command = f'''SELECT genres, count(genres)/{nUsers} as proportion
+                    FROM (SELECT Genres.genres as genres 
+                    FROM Ratings
+                    INNER JOIN Movies ON Movies.movieId = Ratings.movieId
+                    INNER JOIN Genres ON Genres.movieId = Ratings.movieId
+                    INNER JOIN (SELECT  DISTINCT Ratings.userId as userId
+                                FROM Ratings
+                                INNER JOIN Movies ON Ratings.movieId = Movies.movieId
+                                INNER JOIN Genres ON Movies.movieId = Genres.movieId
+                                WHERE Ratings.rating > 3 
+                                and {condition}) as userSpace ON userSpace.userId = Ratings.userId
+                    WHERE Ratings.rating > 3
+                    GROUP BY Ratings.userId, Genres.genres)as genreSets
+                    GROUP BY genres
+                    HAVING NOT {having_condition}
+                    ORDER BY proportion DESC'''
     return query(command, genres + genres, extract_genres)
 
 
 # returns the start_th to the end_th most/least 'sortby' movies inclusive depending on ascending
 # requirements => start and end are both ints, start <= end, start >= 1 and end >= 1
+## optimise this
 def _get_sorted_by_column(limit, page, sortBy='popularity', ascending=1):
     start = limit * page - (limit - 1)
     end = limit * page
@@ -394,7 +392,7 @@ def _get_sorted_by_column(limit, page, sortBy='popularity', ascending=1):
                  LIMIT %s OFFSET %s'''
     return {'movies': query(command, holders, get_sorted_result)}
 
-
+# optimise this
 def _get_nUsers(condition, genres):
     command = f'''SELECT  COUNT(DISTINCT Ratings.userId) as interested_user 
                   FROM Genres, Ratings, Movies 
@@ -403,6 +401,7 @@ def _get_nUsers(condition, genres):
     return query(command, genres, lambda cursor: cursor.fetchone()[0])
 
 
+# optimise this
 def _tagged_genres(nUsers, condition, tags):
     command = f''' SELECT genres, count(genres) / {nUsers} as proportion
                     FROM (
