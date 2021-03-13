@@ -148,7 +148,7 @@ def predict_ratings():
     rating = request.args.get('rating')
 
     responses = [[userId, tags, rating]]
-
+    
     tag_sum = 0
     tag_count = 0
     rating_sum = 0
@@ -208,7 +208,6 @@ def predict_ratings():
             average_rating = 0
 
     return {'predicted_rating': average_rating}
-
 
 # Use Case 6: Predicting the personality traits of viewers who will give a high rating to a soon-to-be-released film
 # whose tags are known.
