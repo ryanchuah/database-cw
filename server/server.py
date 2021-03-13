@@ -207,7 +207,11 @@ def predict_ratings():
     for response in responses:
         userId = response[0]
         tags = response[1]
-        rating = float(response[2])
+        rating = response[2]
+        try:
+            rating = float(rating)
+        except:
+            rating = 0.0
         condition = create_condition(tags, col='Tags.tag')
         # get predicted rating from tags
         tags_average_command = f'''SELECT avg(Ratings.rating) as average_rating
@@ -219,17 +223,17 @@ def predict_ratings():
         tag_count += 1
 
         # find other movies with same rating from user x and and average their rating - average those
-        holders = userId, rating,
-        user_rating_average_command = '''SELECT avg(predicted_rating) as average_rating
-                            FROM Personality_Ratings_table
-                            WHERE hashed_userId = %s AND abs(predicted_rating - %s) < 1'''
+        holders = userId, float(rating),
+        user_rating_average_command = '''SELECT avg(rating) as average_rating
+                            FROM Ratings
+                            WHERE userId = %s AND abs(rating - %s) < 0.5'''
         user_rating_score = query(user_rating_average_command, holders, user_rating_average_result)[0]['average_rating'][0]
         if user_rating_score:
             rating_sum += user_rating_score
         rating_count += 1
 
         total_count += 1
-        total_sum += rating
+        total_sum += float(rating)
 
     if tag_sum != 0 and rating_sum != 0:
         average_rating = ((tag_sum/tag_count) + (rating_sum/rating_count) + (total_sum/total_count)) / 3
