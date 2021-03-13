@@ -85,7 +85,7 @@ def search_movies():
 def single_movie(movie_id):
     holders = movie_id,
 
-    details_command = '''SELECT Movies.title, Movies.release_year, Movies.poster_url, Avg(Ratings.rating) as avg_ratings
+    details_command = '''SELECT Movies.title, Movies.release_year, Movies.poster_url, Avg(Ratings.rating) as avg_rating
                  FROM Ratings, Movies
                  WHERE Movies.movieId = %s AND Ratings.movieId = Movies.movieId
                  GROUP BY Movies.title, Movies.release_year, Movies.poster_url
@@ -176,9 +176,16 @@ def predict_ratings():
 
         # find other movies with same rating from user x and and average their rating - average those
         holders = userId, float(rating),
-        user_rating_average_command = '''SELECT avg(rating) as average_rating
-                                        FROM Ratings
-                                        WHERE userId = %s AND abs(rating - %s) < 0.5'''
+
+        user_rating_average_command = '''SELECT Avg(average_rating_individuals) as average_rating
+            FROM (SELECT Avg(Ratings.rating) as average_rating_individuals
+                    FROM Ratings
+                    WHERE Ratings.movieId IN
+                        (SELECT Ratings.movieId as movie
+                            FROM Ratings WHERE (userId = %s AND abs(rating - %s) < 0.1)
+                        )
+                ) AS B'''
+
         user_rating_score = query(user_rating_average_command, holders, user_rating_average_result)[0]['average_rating'][0]
         if user_rating_score:rating_sum += user_rating_score
         rating_count += 1
