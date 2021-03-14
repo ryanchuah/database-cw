@@ -16,6 +16,16 @@ cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 #
 # app = Flask(__name__)
+# config = {
+#     "DEBUG": True,          # some Flask specific configs
+#     "CACHE_TYPE": "SimpleCache",  # Flask-Caching related configs
+#     "CACHE_DEFAULT_TIMEOUT": 300
+# }
+
+# app = Flask(__name__)
+# # tell Flask to use the above defined config
+# app.config.from_mapping(config)
+# cache = Cache(app)
 
 cache = Cache(app, config={"CACHE_TYPE": "simple"})
 
@@ -38,8 +48,8 @@ config = {
 # sortBy can only take ==> ['movieId', 'title', 'release_year', 'popularity', 'votes', 'avg_ratings', 'polarity_index']
 # ascending ==> 1 or 0. 1 being descending order
 # EXAMPLE: http://localhost:5000/movies?sortBy=release_year&limit=10&page=1&ascending=0
-@cache.cached(timeout=3600)
 @app.route('/movies')
+@cache.cached(timeout=3600)
 @cross_origin()
 def movies():
     limit, page, sortBy, ascending = validate_input()
@@ -47,8 +57,8 @@ def movies():
 
 
 # Searching for movies in the database
-@cache.cached(timeout=3600)
 @app.route("/search")
+@cache.cached(timeout=3600)
 @cross_origin()
 def search_movies():
     sortBy = request.args.get('sortBy')
@@ -86,12 +96,12 @@ def search_movies():
 
 # Use case 2: Searching for a film to obtain a report on viewer reaction to it
 # Use case 4: Segmenting the audience for a released movie
-@cache.cached(timeout=3600)
+# @cache.cached(timeout=3600, key_prefix="current_time")
 @app.route('/movies/<movie_id>')
+@cache.cached(timeout=3600)
 @cross_origin()
 def single_movie(movie_id):
     holders = movie_id,
-
     details_command = '''SELECT Movies.title, Movies.release_year, Movies.poster_url, Avg(Ratings.rating) as avg_rating
                  FROM Ratings, Movies
                  WHERE Movies.movieId = %s AND Ratings.movieId = Movies.movieId
@@ -136,16 +146,14 @@ def single_movie(movie_id):
                      'similar_genres_by_genre': _get_similar_rated_genres(genres),
                      'similar_genres_by_tag': _get_similar_tagged_genres(tags_dict)
                      }
-
-    # print(movie_details)
     # return "individual movie page data will be returned here for movieid: "+movie_id
     return movie_details
 
 
 # Use case 5: Predicting the likely viewer ratings for a soon-to-be-released film based on the tags and or ratings for
 # the film provided by a preview panel of viewers drawn from the population of viewers in the database.
-@cache.cached(timeout=3600)
 @app.route("/predict_rating")
+@cache.cached(timeout=3600)
 @cross_origin()
 def predict_ratings():
     # get tags from front end
