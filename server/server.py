@@ -47,9 +47,9 @@ config = {
 # PARAMS:
 # sortBy can only take ==> ['movieId', 'title', 'release_year', 'popularity', 'votes', 'avg_ratings', 'polarity_index']
 # ascending ==> 1 or 0. 1 being descending order
-# EXAMPLE: http://localhost:5000/movies?sortBy=release_year&limit=10&page=1&ascending=0
+# EXAMPLE: http://localhost/movies?sortBy=release_year&limit=10&page=1&ascending=0
 @app.route('/movies')
-@cache.cached(timeout=3600)
+@cache.cached(timeout=3600, query_string=True)
 @cross_origin()
 def movies():
     limit, page, sortBy, ascending = validate_input()
@@ -58,7 +58,7 @@ def movies():
 
 # Searching for movies in the database
 @app.route("/search")
-@cache.cached(timeout=3600)
+@cache.cached(timeout=3600, query_string=True)
 @cross_origin()
 def search_movies():
     sortBy = request.args.get('sortBy')
@@ -95,8 +95,7 @@ def search_movies():
 
 
 # Use case 2: Searching for a film to obtain a report on viewer reaction to it
-# Use case 4: Segmenting the audience for a released movie
-# @cache.cached(timeout=3600, key_prefix="current_time")
+# Use case 4: Segmenting the audience for a released movie)
 @app.route('/movies/<movie_id>')
 @cache.cached(timeout=3600)
 @cross_origin()
@@ -153,7 +152,7 @@ def single_movie(movie_id):
 # Use case 5: Predicting the likely viewer ratings for a soon-to-be-released film based on the tags and or ratings for
 # the film provided by a preview panel of viewers drawn from the population of viewers in the database.
 @app.route("/predict_rating")
-@cache.cached(timeout=3600)
+@cache.cached(timeout=3600, query_string=True)
 @cross_origin()
 def predict_ratings():
     # get tags from front end
@@ -221,8 +220,8 @@ def predict_ratings():
 
 # Use Case 6: Predicting the personality traits of viewers who will give a high rating to a soon-to-be-released film
 # whose tags are known.
-@cache.cached(timeout=3600)
 @app.route("/predict_personality")
+@cache.cached(timeout=3600, query_string=True)
 @cross_origin()
 def predict_personality():
     tags = tuple(request.args.getlist('tags'))
