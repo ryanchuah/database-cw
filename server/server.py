@@ -77,7 +77,7 @@ def search_movies():
     command = f'''SELECT Movies.movieId as movieId, Movies.title as title, Movies.release_year as release_year, Sum(Ratings.rating) as popularity, 
                  Count(Ratings.rating) as votes, Avg(Ratings.rating) as avg_ratings, VARIANCE(Ratings.rating) as polarity_index 
                  FROM Ratings, Movies 
-                 WHERE Movies.title like %s
+                 WHERE Ratings.movieId = Movies.movieId AND Movies.title like %s
                  GROUP BY Ratings.movieId, Movies.movieId
                  ORDER BY {sortBy} {ordering} 
                  LIMIT %s OFFSET %s'''
