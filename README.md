@@ -61,7 +61,7 @@ $ docker-compose down
         - The size of the preview panel isn't constant.
      
 ####6. Predicting the personality traits of viewers who will give a high rating to a soon-to-be-released film (using the personality/ratings dataset from GroupLens) whose tags are known.
-    This use-case made use of the personality traits dataset from GroupLens
+    This use-case made use of the personality traits dataset from GroupLens. The query gets all movieIds from the original dataset that have the same tags as the soon-to-be released movie. From the personality dataset. we filter out users that have rated these movies less than 4.5 and average the personality traits of the remaining users.
 
 
 ##Additional Features:

@@ -7,6 +7,9 @@ from query_results_templates import get_sorted_result, extract_genres, individua
     get_all_movies_result, genres_movie_result, actors_movie_result, tags_movie_result, ratings_date_movie_result, \
     ratings_percentage_movie_result, tags_average_result, user_rating_average_result, predict_personality_result
 
+Movies_columns = ['movieId', 'title', 'release_year',
+                  'popularity', 'votes', 'avg_ratings', 'polarity_index']
+
 # Flask config
 app = Flask(__name__)
 
@@ -48,40 +51,28 @@ def movies():
 @cache.cached(timeout=3600, query_string=True)
 @cross_origin()
 def search_movies():
-    sortBy = request.args.get('sortBy')
 
-    Movies_columns = ['movieId', 'title', 'imdbId', 'tmdbId']
     search_criteria = request.args.get('search_criteria')
-    movies = []
 
-    if sortBy not in Movies_columns:
-        sortBy = None
-        raise ValueError(
-            f"the request query sortby={sortBy} is not recognized. Either developer error, or SQL injection attempt")
+    limit, page, sortBy, ascending = validate_input()
 
-    limit = request.args.get('limit')
-    if limit:
-        try:
-            limit = int(limit)
-        except ValueError:
-            raise ValueError(
-                f"the request query limit={limit} is not recognized. Either developer error, or SQL injection attempt")
-    else:
-        limit = 10
+    start = limit * page - (limit - 1)
+    end = limit * page
+    holders = ('%'+search_criteria+'%', end - start + 1, start - 1)
 
-    if not sortBy == None:
-        holders = None
-        command = "SELECT * FROM Movies WHERE title like \'%{search_criteria}%\' ORDER BY {sortBy} LIMIT {limit}"
-        movies = query(command, holders, get_all_movies_result)
-    else:
-        holders = None
-        command = "SELECT * FROM Movies WHERE title like \'%{search_criteria}%\' LIMIT {limit}"
-        movies = query(command, holders, get_all_movies_result)
+    ordering = 'DESC' if ascending else 'ASC'
+    command = f'''SELECT Movies.movieId as movieId, Movies.title as title, Movies.release_year as release_year, Sum(Ratings.rating) as popularity, 
+                 Count(Ratings.rating) as votes, Avg(Ratings.rating) as avg_ratings, VARIANCE(Ratings.rating) as polarity_index 
+                 FROM Ratings, Movies 
+                 WHERE Ratings.movieId = Movies.movieId AND Movies.title like %s
+                 GROUP BY Ratings.movieId, Movies.movieId
+                 ORDER BY {sortBy} {ordering} 
+                 LIMIT %s OFFSET %s'''
 
-    return {"movies": movies}
+    return {"movies": query(command, holders, get_sorted_result)}
 
 
-# Use case 2: Searching for a film to obtain a report on viewer reaction to it
+# Use case 2: Searching for a film to obtain a report on viewer react ion to it
 # Use case 4: Segmenting the audience for a released movie)
 @app.route('/movies/<movie_id>')
 @cache.cached(timeout=3600)
@@ -168,9 +159,11 @@ def predict_ratings():
         tags_average_command = f'''SELECT avg(Ratings.rating) as average_rating
                             FROM Ratings, Tags
                             WHERE Ratings.movieId = Tags.movieId AND {condition}'''
-        tag_score = query(tags_average_command, tags, tags_average_result)[0]['average_rating'][0]
+        tag_score = query(tags_average_command, tags, tags_average_result)[
+            0]['average_rating'][0]
 
-        if tag_score:tag_sum += tag_score
+        if tag_score:
+            tag_sum += tag_score
         # find other movies with same rating from user x and and average their rating - average those
         holders = userId, float(rating),
 
@@ -183,15 +176,18 @@ def predict_ratings():
                         )
                 ) AS B'''
 
-        user_rating_score = query(user_rating_average_command, holders, user_rating_average_result)[0]['average_rating'][0]
+        user_rating_score = query(user_rating_average_command, holders, user_rating_average_result)[
+            0]['average_rating'][0]
 
-        if user_rating_score:rating_sum += user_rating_score
+        if user_rating_score:
+            rating_sum += user_rating_score
 
         count += 1
         total_sum += float(rating)
 
     if tag_sum != 0 and rating_sum != 0:
-        average_rating = ((tag_sum/count) + (rating_sum/count) + (total_sum/count)) / 3
+        average_rating = ((tag_sum/count) + (rating_sum /
+                                             count) + (total_sum/count)) / 3
     elif tag_sum != 0:
         average_rating = ((tag_sum/count) + (total_sum/count)) / 2
     elif rating_sum != 0:
@@ -206,6 +202,8 @@ def predict_ratings():
 
 # Use Case 6: Predicting the personality traits of viewers who will give a high rating to a soon-to-be-released film
 # whose tags are known.
+
+
 @app.route("/predict_personality")
 @cache.cached(timeout=3600, query_string=True)
 @cross_origin()
@@ -267,8 +265,7 @@ def validate_input():
     ascending = int(request.args.get('ascending'))
     limit = int(request.args.get('limit'))
     page = int(request.args.get('page'))
-    Movies_columns = ['movieId', 'title', 'release_year',
-                      'popularity', 'votes', 'avg_ratings', 'polarity_index']
+
     if sortBy not in Movies_columns:
         raise ValueError(
             f"the request query column={sortBy} is not recognized. Either developer error, or SQL injection attempt")
@@ -350,13 +347,13 @@ def _get_sorted_by_column(limit, page, sortBy='popularity', ascending=1):
                  LIMIT %s OFFSET %s'''
     return {'movies': query(command, holders, get_sorted_result)}
 
+
 def _get_nUsers(condition, genres):
     command = f'''SELECT  COUNT(DISTINCT Ratings.userId) as interested_user 
                   FROM Genres, Ratings, Movies 
                   WHERE Ratings.rating > 3 and Ratings.movieId = Movies.movieId 
                   and Movies.movieId = Genres.movieId and {condition}'''
     return query(command, genres, lambda cursor: cursor.fetchone()[0])
-
 
 
 def _tagged_genres(nUsers, condition, tags):

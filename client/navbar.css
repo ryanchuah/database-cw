@@ -1,0 +1,7 @@
+div.dropdown-multicol{
+    width: 20em;
+  }
+  div.dropdown-row>a.dropdown-item{
+    display:inline-block;
+    width: 42%;
+  }
