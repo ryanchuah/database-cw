@@ -4,17 +4,44 @@ const rootUrl = "http://localhost";
 const sortByElement = document.getElementById("sortBy");
 
 // HTML "movies table body" element
-const moviesTableBody = document.getElementById("moviesTableBody");
+const popularMoviesTableBody = document.getElementById(
+	"popularMoviesTableBody"
+);
+const polarizingMoviesTableBody = document.getElementById(
+	"polarizingMoviesTableBody"
+);
 
-// onchange handler for HTML "Sort By" element
-sortByElement.onchange = function () {
-	const sortByValue = sortByElement.value;
-	updatePage(sortByValue);
+// // onchange handler for HTML "Sort By" element
+// sortByElement.onchange = function () {
+// 	const sortByValue = sortByElement.value;
+// 	updatePage(sortByValue);
 
-	// store value of "Sort By" to localStorage
-	// this enables us to persist the "Sort By" value through page refreshes
-	window.localStorage.setItem("sortByValue", JSON.stringify(sortByValue));
-};
+// 	// store value of "Sort By" to localStorage
+// 	// this enables us to persist the "Sort By" value through page refreshes
+// 	window.localStorage.setItem("sortByValue", JSON.stringify(sortByValue));
+// };
+
+function updateTables(data, elem) {
+	for (const movie of data.movies) {
+		let tr = document.createElement("tr");
+		let rating_val = parseFloat(movie.avg_ratings);
+		rating_val = rating_val ? Math.round(rating_val * 2) / 2 : "Unknown"; //round to nearest 0.5
+
+		let polarity_index = parseFloat(movie.polarity_index);
+		polarity_index = polarity_index
+			? Math.round(polarity_index * 2) / 2
+			: "Unknown";
+		tr.innerHTML = `
+			<td>${movie.movieId}</td>
+			<td><a href="movies/movie.html?movieId=${movie.movieId}">${movie.title}</a></td>
+			<td>${movie.release_year}</td>
+			<td>${rating_val}</td>
+			<td>${movie.votes}</td>
+			<td>${polarity_index}</td>
+			`;
+		elem.appendChild(tr);
+	}
+}
 
 async function updateDisplay(sortByValue, limit, page) {
 	// most calls to updateDisplay will be through updatePage()
@@ -22,93 +49,53 @@ async function updateDisplay(sortByValue, limit, page) {
 	// sortByValue and limit will never be undefined
 
 	// clear moviesTableBody
-	moviesTableBody.innerHTML = "";
+	popularMoviesTableBody.innerHTML = "";
+	polarizingMoviesTableBody.innerHTML = "";
 
-	let url =
-		`${rootUrl}/movies?limit=` +
-		limit +
-		"&sortBy=" +
-		sortByValue +
-		"&page=" +
-		page +
-		"&ascending=" +
-		1;
+	const popularUrl =
+		`${rootUrl}/movies?limit=10` +
+		"&sortBy=popularity" +
+		"&page=1" +
+		"&ascending=1";
 
-	console.log(url);
+	const polarizingUrl =
+		`${rootUrl}/movies?limit=10` +
+		"&sortBy=polarity_index" +
+		"&page=1" +
+		"&ascending=1";
 
-	const response = await fetch(url);
+	console.log("Popular url:");
+	console.log(popularUrl);
 
-	if (!response.ok) {
+	console.log("Polarizing url:");
+	console.log(polarizingUrl);
+
+	const popularResponse = await fetch(popularUrl);
+	const polarizingResponse = await fetch(polarizingUrl);
+	if (!popularResponse.ok) {
 		// TODO: graceful handling
 		console.error(
 			"Error response from server. Error code: ",
-			response.status
+			popularResponse.status
 		);
 	} else {
-		const data = await response.json();
-		let rating_val;
-		for (const movie of data.movies) {
-			let tr = document.createElement("tr");
-			rating_val = parseFloat(movie.avg_ratings);
-			rating_val = rating_val
-				? Math.round(rating_val * 2) / 2
-				: "Unknown"; //round to nearest 0.5
-			tr.innerHTML = `
-			<td>${movie.movieId}</td>
-			<td><a href="movies/movie.html?movieId=${movie.movieId}">${movie.title}</a></td>
-			<td>${movie.release_year}</td>
-			<td>${rating_val}</td>
-			<td>${movie.votes}</td>
-			`;
-			moviesTableBody.appendChild(tr);
-		}
+		const popularData = await popularResponse.json();
+		updateTables(popularData, popularMoviesTableBody);
+		console.log(popularData);
 	}
-}
 
-function updatePagination(page) {
-	// HTML "Sort By" element
-	const pagination = document.getElementById("pagination");
-	// <li class="page-item active"><a class="page-link" href="#" onclick="updatePage(null, null, 1)">${page}</a></li>
-	pagination.innerHTML = `
-	<li class="page-item"><a class="page-link" href="#" onclick="updatePage(null, null, 1)">&laquo;</a></li>
-	 <li class="page-item">
-		<a class="page-link" href="#" onclick="updatePage(null, null, ${
-			page - 1
-		})" aria-label="Previous">
-                <span aria-hidden="true"><</span>
-		</a>
-	</li>`;
-
-	if (page == 1) {
-		pagination.innerHTML += `
-       
-        <li class="page-item active"><a class="page-link" href="#">${page}</a></li>
-        <li class="page-item"><a class="page-link" href="#" onclick="updatePage(null, null, ${
-			page + 1
-		})">${page + 1}</a></li>
-        <li class="page-item"><a class="page-link" href="#" onclick="updatePage(null, null, ${
-			page + 2
-		})">${page + 2}</a></li>`;
+	if (!polarizingResponse.ok) {
+		// TODO: graceful handling
+		console.error(
+			"Error response from server. Error code: ",
+			polarizingResponse.status
+		);
 	} else {
-		pagination.innerHTML += `
-       
-        <li class="page-item"><a class="page-link" href="#" onclick="updatePage(null, null, ${
-			page - 1
-		})">${page - 1}</a></li>
-        <li class="page-item active"><a class="page-link" href="#" onclick="updatePage(null, null, ${page})">${page}</a></li>
-        <li class="page-item"><a class="page-link" href="#" onclick="updatePage(null, null, ${
-			page + 1
-		})">${page + 1}</a></li>
-        `;
+		const polarizingData = await polarizingResponse.json();
+		console.log(polarizingData);
+
+		updateTables(polarizingData, polarizingMoviesTableBody);
 	}
-	pagination.innerHTML += `
-	<li class="page-item">
-            <a class="page-link" href="#" onclick="updatePage(null, null, ${
-				page + 1
-			})" aria-label="Next">
-                <span aria-hidden="true">></span>
-            </a>
-	</li>`;
 }
 
 // this function handles the sanity check for sortByValue, limit, page before passing on to updateDisplay(..)
@@ -121,10 +108,10 @@ function updatePage(sortByValue, limit, page) {
 			: "popularity";
 	}
 
-	// update "selected" attribute in sortBy HTML element
-	document.querySelector(
-		'#sortBy [value="' + sortByValue + '"]'
-	).selected = true;
+	// // update "selected" attribute in sortBy HTML element
+	// document.querySelector(
+	// 	'#sortBy [value="' + sortByValue + '"]'
+	// ).selected = true;
 
 	// if limit is null, then we check if it is stored in localStorage
 	// if it is not stored in localStorage, we use the value 10
@@ -156,26 +143,7 @@ function updatePage(sortByValue, limit, page) {
 		}
 	}
 
-	// if (!page) {
-	// 	page = window.localStorage.getItem("page")
-	// 		? JSON.parse(window.localStorage.getItem("page"))
-	// 		: 1;
-	// }
-	// if (!page) {
-	// 	page = 1;
-	// }
-
-	// let column;
-	// if (sortByValue != "polarity" && sortByValue != "popularity") {
-	// 	console.log("HERE");
-
-	// 	// means we are sorting by column name
-	// 	column = sortByValue;
-	// 	sortByValue = "column";
-	// }
-
 	updateDisplay(sortByValue, limit, page);
-	updatePagination(page);
 }
 
 // call updatePage() on every page load
