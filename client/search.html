@@ -38,18 +38,28 @@
 			>
 		</div>
 
-		<select
-			id="sortBy"
-			class="form-select"
-			aria-label="Default select example"
-		>
-			<option value="popularity">Popularity</option>
-			<option value="polarity_index">Polarity</option>
+		<div class="d-flex">
+			<select
+				id="sortBy"
+				class="custom-select"
+				aria-label="Default select example"
+			>
+				<option value="popularity">Popularity</option>
+				<option value="polarity_index">Polarity</option>
 
-			<!-- value MUST correspond to a column name in Movies table -->
-			<option value="movieId">Movie ID</option>
-			<option value="title">Title</option>
-		</select>
+				<!-- value MUST correspond to a column name in Movies table -->
+				<option value="movieId">Movie ID</option>
+				<option value="title">Title</option>
+			</select>
+			<select
+				id="ascending"
+				class="custom-select"
+				aria-label="Default select example"
+			>
+				<option value="0">Ascending</option>
+				<option value="1">Descending</option>
+			</select>
+		</div>
 
 		<table class="table">
 			<thead>

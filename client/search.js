@@ -2,6 +2,7 @@ const rootUrl = "http://localhost";
 
 // HTML "Sort By" element
 const sortByElement = document.getElementById("sortBy");
+const ascendingElement = document.getElementById("ascending");
 
 // HTML "movies table body" element
 const moviesTableBody = document.getElementById("moviesTableBody");
@@ -19,7 +20,17 @@ sortByElement.onchange = function () {
 	);
 };
 
-async function updateDisplay(sortByValue, limit, page, searchTerm) {
+ascendingElement.onchange = function () {
+	const ascending = ascendingElement.value;
+
+	updatePage(null, null, null, null, ascending);
+
+	// store value of "Sort By" to localStorage
+	// this enables us to persist the "Sort By" value through page refreshes
+	window.localStorage.setItem("search-ascending", JSON.stringify(ascending));
+};
+
+async function updateDisplay(sortByValue, limit, page, searchTerm, ascending) {
 	// most calls to updateDisplay will be through updatePage()
 	// updatePage() handles sets sortByValue and limit to non-null/non-undefined values, so
 	// sortByValue and limit will never be undefined
@@ -35,7 +46,7 @@ async function updateDisplay(sortByValue, limit, page, searchTerm) {
 		"&page=" +
 		page +
 		"&ascending=" +
-		1 +
+		ascending +
 		"&search_criteria=" +
 		searchTerm;
 
@@ -117,7 +128,7 @@ function updatePagination(page) {
 }
 
 // this function handles the sanity check for sortByValue, limit, page before passing on to updateDisplay(..)
-function updatePage(sortByValue, limit, page, searchTerm) {
+function updatePage(sortByValue, limit, page, searchTerm, ascending) {
 	// if sortByValue is null, then we check if it is stored in localStorage
 	// if it is not stored in localStorage, we use the value "default"
 	if (!sortByValue) {
@@ -161,11 +172,10 @@ function updatePage(sortByValue, limit, page, searchTerm) {
 		}
 	}
 
-	if (!searchTerm) {
+	if (!searchTerm || searchTerm == "") {
 		searchTerm = window.localStorage.getItem("search-searchTerm")
 			? JSON.parse(window.localStorage.getItem("search-searchTerm"))
 			: "";
-		page = 1;
 	} else {
 		window.localStorage.setItem(
 			"search-searchTerm",
@@ -173,7 +183,19 @@ function updatePage(sortByValue, limit, page, searchTerm) {
 		);
 	}
 
-	updateDisplay(sortByValue, limit, page, searchTerm);
+	if (!ascending) {
+		ascending = window.localStorage.getItem("search-ascending")
+			? JSON.parse(window.localStorage.getItem("search-ascending"))
+			: 1;
+	} else {
+		window.localStorage.setItem(
+			"search-ascending",
+			JSON.stringify(ascending)
+		);
+	}
+	// console.log(page);
+
+	updateDisplay(sortByValue, limit, page, searchTerm, ascending);
 	updatePagination(page);
 }
 

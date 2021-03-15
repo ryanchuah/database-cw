@@ -1,7 +1,7 @@
 const navbar = document.getElementById("navbar");
 navbar.innerHTML = `
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
-	<a class="navbar-brand" href="#">Navbar</a>
+	<a class="navbar-brand" href="index.html">Home</a>
 	<button
 		class="navbar-toggler"
 		type="button"
@@ -17,8 +17,8 @@ navbar.innerHTML = `
 	<div class="collapse navbar-collapse" id="navbarSupportedContent">
 		<ul class="navbar-nav mr-auto">
 			<li class="nav-item active">
-				<a class="nav-link" href="#"
-					>Home <span class="sr-only">(current)</span></a
+				<a class="nav-link" href="index.html"
+					>Movies <span class="sr-only">(current)</span></a
 				>
 			</li>
 
@@ -32,7 +32,7 @@ navbar.innerHTML = `
 					aria-haspopup="true"
 					aria-expanded="false"
 				>
-					Dropdown
+					Genres
 				</a>
 				<div
 					class="dropdown-menu dropdown-multicol"
@@ -94,12 +94,25 @@ navbar.innerHTML = `
 			<button class="btn btn-outline-success my-2 my-sm-0" type="submit">
 				Search
 			</button>
+            <button class="btn btn-outline-success my-2 my-sm-0" onclick="handleAllMovies()">
+				All Movies
+			</button>
 		</form>
 	</div>
 </nav>
 `;
 
-function searchMovie(event) {
+function handleAllMovies() {
+	window.localStorage.setItem("search-searchTerm", JSON.stringify(""));
+	window.localStorage.setItem(
+		"search-sortByValue",
+		JSON.stringify("popularity")
+	);
+	window.localStorage.setItem("search-limit", JSON.stringify(10));
+	window.localStorage.setItem("search-page", JSON.stringify(1));
+	window.location.href = "search.html";
+}
+async function searchMovie(event) {
 	event.preventDefault();
 	const searchTerm = event.target.elements.search.value;
 	window.localStorage.setItem(
