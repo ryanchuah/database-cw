@@ -129,17 +129,24 @@ def single_movie(movie_id):
 
 # Use case 5: Predicting the likely viewer ratings for a soon-to-be-released film based on the tags and or ratings for
 # the film provided by a preview panel of viewers drawn from the population of viewers in the database.
-@app.route("/predict_rating")
-@cache.cached(timeout=3600, query_string=True)
+@app.route("/predict_rating", methods=['POST'])
+# @cache.cached(timeout=3600, query_string=True)
 @cross_origin()
 def predict_ratings():
     # get tags from front end
-    responses = tuple(request.args.getlist('responses'))
-    userId = request.args.get('userId')
-    tags = tuple(request.args.getlist('tags'))
-    rating = request.args.get('rating')
+    # responses = tuple(request.args.getlist('responses'))
+    # userId = request.args.get('userId')
+    # tags = tuple(request.args.getlist('tags'))
+    # rating = request.args.get('rating')
+    responses = []
+    for user in request.get_json()['users']:
+        print(user)
+        rating = int(user['rating'].split('/')[0])  # TODO: remove later
+        responses.append([user['userId'], tuple(user['tags']), rating])
 
-    responses = [[userId, tags, rating]]
+    # responses = [[userId, tags, rating]]
+    print(responses)
+
     tag_sum = 0
     rating_sum = 0
     total_sum = 0
@@ -204,11 +211,28 @@ def predict_ratings():
 # whose tags are known.
 
 
-@app.route("/predict_personality")
-@cache.cached(timeout=3600, query_string=True)
+@app.route("/predict_personality", methods=['GET', 'POST'])
+# @cache.cached(timeout=3600, query_string=True)
 @cross_origin()
 def predict_personality():
-    tags = tuple(request.args.getlist('tags'))
+    tags = []
+    # print()
+    # print()
+    print(request.get_json())
+    # tags = [t['tag'] for t in request.get_json()]
+    for t in request.get_json()['tags']:
+        print(t)
+        tags.append(t['tag'])
+    # return {}
+    # # print(request.get_json()['users'])
+
+    print()
+    print()
+    print()
+    print(tags)
+    # tags = tuple(['Funny', 'Funny', 'Funny'])
+
+    # tags = tuple(request.args.getlist('tags'))
     condition = create_condition(tags, col='Tags.tag')
     command = f'''SELECT avg(openness) as avg_openness, avg(agreeableness) as avg_agreeableness,   
                     avg(emotional_stability) as avg_emotional_stability, avg(conscientiousness) as conscientiousness, 
