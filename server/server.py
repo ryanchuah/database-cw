@@ -17,19 +17,6 @@ app = Flask(__name__)
 # this should be removed when we deploy to production servers
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
-#
-# app = Flask(__name__)
-# config = {
-#     "DEBUG": True,          # some Flask specific configs
-#     "CACHE_TYPE": "SimpleCache",  # Flask-Caching related configs
-#     "CACHE_DEFAULT_TIMEOUT": 300
-# }
-
-# app = Flask(__name__)
-# # tell Flask to use the above defined config
-# app.config.from_mapping(config)
-# cache = Cache(app)
-
 cache = Cache(app, config={"CACHE_TYPE": "simple"})
 
 
