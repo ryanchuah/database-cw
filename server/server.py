@@ -210,7 +210,9 @@ def predict_ratings():
 def predict_personality():
     tags = tuple(request.args.getlist('tags'))
     condition = create_condition(tags, col='Tags.tag')
-    command = f'''SELECT avg(openness) as avg_openness, avg(agreeableness) as avg_agreeableness, avg(emotional_stability) as avg_emotional_stability, avg(conscientiousness) as conscientiousness, avg(extraversion) as extraversion
+    command = f'''SELECT avg(openness) as avg_openness, avg(agreeableness) as avg_agreeableness,   
+                    avg(emotional_stability) as avg_emotional_stability, avg(conscientiousness) as conscientiousness, 
+                    avg(extraversion) as extraversion
                     FROM Personality_Attributes_table
                     INNER JOIN Personality_Ratings_table ON Personality_Attributes_table.hashed_userId = Personality_Ratings_table.hashed_userId
                     INNER JOIN (SELECT movieId FROM Tags WHERE {condition}) as temp ON temp.movieId = Personality_Ratings_table.movieId
@@ -314,17 +316,17 @@ def _similar_genres(nUsers, condition, genres):
     having_condition = create_condition(genres, col='genres')
     command = f'''SELECT genres, count(genres)/{nUsers} as proportion
                     FROM (SELECT Genres.genres as genres 
-                    FROM Ratings
-                    INNER JOIN Movies ON Movies.movieId = Ratings.movieId
-                    INNER JOIN Genres ON Genres.movieId = Ratings.movieId
-                    INNER JOIN (SELECT  DISTINCT Ratings.userId as userId
-                                FROM Ratings
-                                INNER JOIN Movies ON Ratings.movieId = Movies.movieId
-                                INNER JOIN Genres ON Movies.movieId = Genres.movieId
-                                WHERE Ratings.rating > 3 
-                                and {condition}) as userSpace ON userSpace.userId = Ratings.userId
-                    WHERE Ratings.rating > 3
-                    GROUP BY Ratings.userId, Genres.genres)as genreSets
+                            FROM Ratings
+                            INNER JOIN Movies ON Movies.movieId = Ratings.movieId
+                            INNER JOIN Genres ON Genres.movieId = Ratings.movieId
+                            INNER JOIN (SELECT  DISTINCT Ratings.userId as userId
+                                        FROM Ratings
+                                        INNER JOIN Movies ON Ratings.movieId = Movies.movieId
+                                        INNER JOIN Genres ON Movies.movieId = Genres.movieId
+                                        WHERE Ratings.rating > 3 
+                                        and {condition}) as userSpace ON userSpace.userId = Ratings.userId
+                            WHERE Ratings.rating > 3
+                            GROUP BY Ratings.userId, Genres.genres)as genreSets
                     GROUP BY genres
                     HAVING NOT {having_condition}
                     ORDER BY proportion DESC'''
@@ -342,7 +344,7 @@ def _get_sorted_by_column(limit, page, sortBy='popularity', ascending=1):
                  Count(Ratings.rating) as votes, Avg(Ratings.rating) as avg_ratings, VARIANCE(Ratings.rating) as polarity_index 
                  FROM Ratings, Movies 
                  WHERE Ratings.movieId = Movies.movieId 
-                 GROUP BY Ratings.movieId 
+                 GROUP BY movieId, title, release_year
                  ORDER BY {sortBy} {ordering} 
                  LIMIT %s OFFSET %s'''
     return {'movies': query(command, holders, get_sorted_result)}
