@@ -3,6 +3,7 @@ const rootUrl = "http://localhost";
 // HTML "Sort By" element
 const sortByElement = document.getElementById("sortBy");
 const ascendingElement = document.getElementById("ascending");
+const searchHeaderElement = document.getElementById("search-header");
 
 // HTML "movies table body" element
 const moviesTableBody = document.getElementById("moviesTableBody");
@@ -30,11 +31,18 @@ ascendingElement.onchange = function () {
 	window.localStorage.setItem("search-ascending", JSON.stringify(ascending));
 };
 
-async function updateDisplay(sortByValue, limit, page, searchTerm, ascending) {
+async function updateDisplay(
+	sortByValue,
+	limit,
+	page,
+	searchTerm,
+	ascending,
+	searchHeader
+) {
 	// most calls to updateDisplay will be through updatePage()
 	// updatePage() handles sets sortByValue and limit to non-null/non-undefined values, so
 	// sortByValue and limit will never be undefined
-
+	searchHeaderElement.innerHTML = `<h1>${searchHeader}</h1>`;
 	// clear moviesTableBody
 	moviesTableBody.innerHTML = "";
 
@@ -171,11 +179,17 @@ function updatePage(sortByValue, limit, page, searchTerm, ascending) {
 			btn.classList.add("active");
 		}
 	}
+	let searchHeader;
 
 	if (!searchTerm || searchTerm == "") {
 		searchTerm = window.localStorage.getItem("search-searchTerm")
 			? JSON.parse(window.localStorage.getItem("search-searchTerm"))
 			: "";
+		if (searchTerm == "") {
+			searchHeader = "All Movies";
+		} else {
+			searchHeader = `Search results for: ${searchTerm}`;
+		}
 	} else {
 		window.localStorage.setItem(
 			"search-searchTerm",
@@ -195,7 +209,14 @@ function updatePage(sortByValue, limit, page, searchTerm, ascending) {
 	}
 	// console.log(page);
 
-	updateDisplay(sortByValue, limit, page, searchTerm, ascending);
+	updateDisplay(
+		sortByValue,
+		limit,
+		page,
+		searchTerm,
+		ascending,
+		searchHeader
+	);
 	updatePagination(page);
 }
 
