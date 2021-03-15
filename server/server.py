@@ -183,8 +183,7 @@ def predict_ratings():
                         )
                 ) AS B'''
 
-        user_rating_score = query(user_rating_average_command, holders, user_rating_average_result)[
-            0]['average_rating'][0]
+        user_rating_score = query(user_rating_average_command, holders, user_rating_average_result)[0]['average_rating'][0]
 
         if user_rating_score:
             rating_sum += user_rating_score
