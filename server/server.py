@@ -141,7 +141,17 @@ def predict_ratings():
     responses = []
     for user in request.get_json()['users']:
         print(user)
-        rating = int(user['rating'].split('/')[0])  # TODO: remove later
+        rating = 0
+        tags = ()
+        try:
+            rating = float(user['rating'].split('/')[0])  # TODO: remove later
+        except:
+            rating = 0
+        try:
+            tags = tuple(user['tags'])
+        except:
+            tags = ()
+
         responses.append([user['userId'], tuple(user['tags']), rating])
 
     # responses = [[userId, tags, rating]]
@@ -151,6 +161,8 @@ def predict_ratings():
     rating_sum = 0
     total_sum = 0
     count = 0
+    tag_count = 0
+    rating_count = 0
     average_rating = 0
 
     for response in responses:
@@ -171,6 +183,7 @@ def predict_ratings():
 
         if tag_score:
             tag_sum += tag_score
+            tag_count += 1
         # find other movies with same rating from user x and and average their rating - average those
         holders = userId, float(rating),
 
@@ -179,7 +192,7 @@ def predict_ratings():
                     FROM Ratings
                     WHERE Ratings.movieId IN
                         (SELECT Ratings.movieId as movie
-                            FROM Ratings WHERE (userId = %s AND abs(rating - %s) < 0.1)
+                            FROM Ratings WHERE (userId = %s AND abs(rating - %s) < 0.5)
                         )
                 ) AS B'''
 
@@ -187,17 +200,17 @@ def predict_ratings():
 
         if user_rating_score:
             rating_sum += user_rating_score
+            rating_count += 1
 
         count += 1
         total_sum += float(rating)
 
     if tag_sum != 0 and rating_sum != 0:
-        average_rating = ((tag_sum/count) + (rating_sum /
-                                             count) + (total_sum/count)) / 3
+        average_rating = ((tag_sum/tag_count) + (rating_sum / rating_count) + (total_sum/count)) / 3
     elif tag_sum != 0:
-        average_rating = ((tag_sum/count) + (total_sum/count)) / 2
+        average_rating = ((tag_sum/tag_count) + (total_sum/rating_count)) / 2
     elif rating_sum != 0:
-        average_rating = ((rating_sum/count) + (total_sum/count)) / 2
+        average_rating = ((rating_sum/tag_count) + (total_sum/rating_count)) / 2
     else:
         try:
             average_rating = total_sum/count
