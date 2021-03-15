@@ -8,6 +8,7 @@ const rating = document.getElementById("rating");
 const actors = document.getElementById("actors");
 const tags = document.getElementById("tags");
 const breakdownByGenres = document.getElementById("breakdown-genres");
+const breakdownByTags = document.getElementById("breakdown-tags");
 
 function titleCase(str) {
 	str = str.toLowerCase().split(" ");
@@ -58,9 +59,47 @@ async function updateDisplay() {
 		);
 	} else {
 		const data = await response.json();
+		console.log(data);
+
 		document.title = data.details[0].title;
 
 		console.log(data);
+
+		let percentage;
+		for (var i = 0; i < data.similar_genres_by_genre.length; i++) {
+			currGenre = data.similar_genres_by_genre[i];
+
+			percentage = parseFloat(data.similar_genres_by_genre[i].proportion);
+
+			percentage = Math.round(percentage * 100);
+
+			breakdownByGenres.innerHTML += `
+			<div class="d-flex justify-content-between">
+				<p>${currGenre.genre}</p>
+				<p>${percentage}%</p>
+			</div>`;
+			if (i == 5) {
+				break;
+			}
+		}
+
+		for (var i = 0; i < data.similar_genres_by_tag.length; i++) {
+			currGenre = data.similar_genres_by_tag[i];
+
+			percentage = parseFloat(currGenre.proportion);
+
+			percentage = Math.round(percentage * 100);
+
+			breakdownByTags.innerHTML += `
+			<div class="d-flex justify-content-between">
+				<p>${currGenre.genre}</p>
+				<p>${percentage}%</p>
+			</div>`;
+			if (i == 5) {
+				break;
+			}
+		}
+
 		const lst_actors = data.actors.map((item) => item.actor[0]);
 
 		poster.innerHTML = `<img src="https://image.tmdb.org/t/p/w500${data.details[0].poster_url}" id="poster" onerror="javascript:this.src='images/unavailable.png'"/>`;
