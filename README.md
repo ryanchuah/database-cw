@@ -71,7 +71,8 @@ We also implemented a load balancer using Nginx to optimise resource utilisation
 
 ### TMDB API
 
-### Caching
+### Caching  
+We also implemented caching of query results. By caching the results of a query the first time it is requested, it means that if it is asked for again, the results of that query can be returned to the user very quickly. This is due to no calculation or processing needing to be carried out since the results are still available from the first query. This reduces latency and improves the performance of the system.
 
 ## Assumptions
 
