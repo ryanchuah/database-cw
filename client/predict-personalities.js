@@ -120,15 +120,31 @@ async function predictPersonality() {
 
 		predictedPersonalityElement.innerHTML = `
         <b>Predicted agreeableness: </b>
-        ${predictedPersonality.agreeableness}<br/>
+        ${
+			Math.round(parseFloat(predictedPersonality.agreeableness) * 100) /
+			100
+		}<br/>
         <b>Predicted conscientiousness: </b>
-        ${predictedPersonality.conscientiousness}<br/>
+        ${
+			Math.round(
+				parseFloat(predictedPersonality.conscientiousness) * 100
+			) / 100
+		}<br/>
         <b>Predicted emotional_stability: </b>
-        ${predictedPersonality.emotional_stability}<br/>
+        ${
+			Math.round(
+				parseFloat(predictedPersonality.emotional_stability) * 100
+			) / 100
+		}<br/>
         <b>Predicted extraversion: </b>
-        ${predictedPersonality.extraversion}<br/>
+        ${
+			Math.round(parseFloat(predictedPersonality.extraversion) * 100) /
+			100
+		}<br/>
         <b>Predicted openness: </b>
-        ${predictedPersonality.openness}<br/>
+        ${
+			Math.round(parseFloat(predictedPersonality.openness) * 100) / 100
+		}<br/>
         `;
 		personalityRadar(predictedPersonality);
 
