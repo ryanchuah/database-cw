@@ -156,8 +156,6 @@ def predict_ratings():
     average_rating = 0
 
     for response in responses:
-        print("RESPONSEE")
-        print (response)
         userId = response[0]
         tags = response[1]
         rating = response[2]
@@ -214,23 +212,17 @@ def predict_ratings():
 
 # Use Case 6: Predicting the personality traits of viewers who will give a high rating to a soon-to-be-released film
 # whose tags are known.
-@app.route("/predict_personality", methods=['GET', 'POST'])
+@app.route("/predict_personality", methods=['POST'])
 @cross_origin()
 def predict_personality():
     tags = []
     for t in request.get_json()['tags']:
-        print(t)
         tags.append(t['tag'])
 
     condition = create_condition(tags, col='Tags.tag')
-<<<<<<< HEAD
     command = f'''SELECT avg(openness) as avg_openness, avg(agreeableness) as avg_agreeableness,   
                     avg(emotional_stability) as avg_emotional_stability, avg(conscientiousness) as conscientiousness, 
                     avg(extraversion) as extraversion
-=======
-    command = f'''SELECT avg(openness) as avg_openness, avg(agreeableness) as avg_agreeableness, avg(emotional_stability) as avg_emotional_stability, 
-    avg(conscientiousness) as conscientiousness, avg(extraversion) as extraversion
->>>>>>> 0144a558fbad5ffbc7db5ac0eef8e99307d49b66
                     FROM Personality_Attributes_table
                     INNER JOIN Personality_Ratings_table ON Personality_Attributes_table.hashed_userId = Personality_Ratings_table.hashed_userId
                     INNER JOIN (SELECT movieId FROM Tags WHERE {condition}) as temp ON temp.movieId = Personality_Ratings_table.movieId
@@ -238,29 +230,25 @@ def predict_personality():
     return {"personality": query(command, tags, predict_personality_result)}
 
 
-# # Error routes
-# @app.errorhandler(404)
-# def page_not_found(e):
-#     # note that we set the 404 status explicitly
-#     return "Page not found", 404
+# Error routes
+@app.errorhandler(404)
+def page_not_found(e):
+    return "Page not found", 404
 
 
-# @app.errorhandler(403)
-# def page_not_found(e):
-#     # note that we set the 404 status explicitly
-#     return "403", 403
+@app.errorhandler(403)
+def page_not_found(e):
+    return "403", 403
 
 
-# @app.errorhandler(410)
-# def page_not_found(e):
-#     # note that we set the 404 status explicitly
-#     return "410", 410
+@app.errorhandler(410)
+def page_not_found(e):
+    return "410", 410
 
 
-# @app.errorhandler(500)
-# def page_not_found(e):
-#     # note that we set the 404 status explicitly
-#     return "Internal server error", 500
+@app.errorhandler(500)
+def page_not_found(e):
+    return "Internal server error", 500
 
 
 # Function to run queries

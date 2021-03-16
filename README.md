@@ -88,20 +88,19 @@ a specific movie to ensure that our predictions were accurate.
 
 ## Sample Request:
 ### Use case 1 & 3:
-http://localhost:63342/database-cw/client/search.html
+http://localhost/movies/1
 
-### Use case 2 & 4:
-http://localhost:63342/database-cw/client/movies/movie.html?movieId=318
+### Use case 2:
+http://localhost/search?sortBy=release_year&limit=10&page=1&ascending=0&search_criteria=Toy
+
+### Use case 4:
+http://localhost/movies?sortBy=popularity&limit=10&page=1&ascending=1
 
 ### Use case 5:
-http://localhost:63342/database-cw/client/predict-ratings.html#
+http://localhost/predict_ratings
 
 ### Use case 6:
-http://localhost:63342/database-cw/client/predict-personality.html
-
-### Index page:
-http://localhost:63342/database-cw/client/index.html
-
+http://localhost/predict_personality
 
 
 ## Viewing console output from index.js
