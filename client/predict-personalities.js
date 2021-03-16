@@ -4,7 +4,7 @@ const tagsTableBodyElement = document.getElementById("tagsTableBody");
 const addTagsElement = document.getElementById("add-tags");
 addTagsElement.addEventListener("submit", addTag);
 const predictButtonElement = document.getElementById("predict-btn");
-
+let personalityChart;
 const predictedPersonalityElement = document.getElementById(
 	"predicted-personality"
 );
@@ -150,6 +150,7 @@ async function predictPersonality() {
 		if (!predictedPersonality.agreeableness) {
 			predictedPersonalityElement.innerHTML =
 				"<p>Unfortunately, we do not have a personality analysis of the tags that you have inputted. Try using more common tags</p>";
+			personalityChart.destroy();
 			return;
 		}
 
@@ -190,7 +191,7 @@ async function predictPersonality() {
 function personalityRadar(personality) {
 	var ctx = document.getElementById("personality-radar").getContext("2d");
 
-	new Chart(ctx, {
+	personalityChart = new Chart(ctx, {
 		type: "radar",
 		data: {
 			labels: Object.keys(personality),
