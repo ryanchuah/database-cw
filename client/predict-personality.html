@@ -59,21 +59,15 @@
 				<tbody id="tagsTableBody"></tbody>
 			</table>
 
-			<div class="d-flex">
-				<button
-					type="button"
-					class="btn btn-outline-danger btn-block mx-5"
-					onclick="clearTags()"
-				>
-					Clear
-				</button>
-				<button
+			<div class="d-flex" id="predict-btn">
+				<!-- <div id="predict-btn"></div> -->
+				<!-- <button
 					type="button"
 					class="btn btn-primary btn-block mx-5"
 					onclick="predictPersonality()"
 				>
 					Predict Personality
-				</button>
+				</button> -->
 			</div>
 
 			<h5 class="mt-5">
@@ -86,12 +80,6 @@
 						The predicted personality breakdown will be shown here
 					</p>
 				</div>
-				<!-- <p id="predicted-personality">
-						<b>Predicted personality:</b
-						><span style="color: gray"
-							>The predicted personality will be shown here</span
-						>
-					</p> -->
 				<div
 					class="canvas-container"
 					style="width: 400px; height: 400px"

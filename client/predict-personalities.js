@@ -3,6 +3,7 @@ const tagsTableBodyElement = document.getElementById("tagsTableBody");
 
 const addTagsElement = document.getElementById("add-tags");
 addTagsElement.addEventListener("submit", addTag);
+const predictButtonElement = document.getElementById("predict-btn");
 
 const predictedPersonalityElement = document.getElementById(
 	"predicted-personality"
@@ -52,6 +53,40 @@ function removeTag(tagId) {
 }
 
 function updateTable(tags) {
+	if (tags.length == 0) {
+		predictButtonElement.innerHTML = `
+		<button
+			type="button"
+			class="btn btn-outline-danger btn-block mx-5"
+			onclick="clearTags()"
+		>
+			Clear
+		</button>
+		<button
+			type="button"
+			class="btn btn-secondary btn-block mx-5"
+			onclick="predictPersonality()"
+			disabled
+		>
+			Predict Personality
+		</button>`;
+	} else {
+		predictButtonElement.innerHTML = `
+		<button
+			type="button"
+			class="btn btn-outline-danger btn-block mx-5"
+			onclick="clearTags()"
+		>
+			Clear
+		</button>
+		<button
+			type="button"
+			class="btn btn-primary btn-block mx-5"
+			onclick="predictPersonality()"
+		>
+			Predict Personality
+		</button>`;
+	}
 	const exampleTags = ["Funny", "Witty", "Prison"];
 	tagsTableBodyElement.innerHTML = "";
 	for (t of tags) {

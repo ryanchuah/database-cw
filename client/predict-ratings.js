@@ -5,6 +5,7 @@ const addUserElement = document.getElementById("add-user");
 addUserElement.addEventListener("submit", addUser);
 
 const predictedRatingElement = document.getElementById("predicted-rating");
+const predictButtonElement = document.getElementById("predict-btn");
 
 if (!window.localStorage.getItem("users")) {
 	window.localStorage.setItem("users", JSON.stringify([]));
@@ -92,6 +93,40 @@ function clearUsers() {
 }
 
 function updateTable(users) {
+	if (users.length == 0) {
+		predictButtonElement.innerHTML = `
+		<button
+			type="button"
+			class="btn btn-outline-danger btn-block mx-5"
+			onclick="clearUsers()"
+		>
+			Clear
+		</button>
+		<button
+			type="button"
+			class="btn btn-secondary btn-block mx-5"
+			onclick="predictRating()"
+			disabled
+		>
+			Predict Rating
+		</button>`;
+	} else {
+		predictButtonElement.innerHTML = `
+		<button
+			type="button"
+			class="btn btn-outline-danger btn-block mx-5"
+			onclick="clearUsers()"
+		>
+			Clear
+		</button>
+		<button
+			type="button"
+			class="btn btn-primary btn-block mx-5"
+			onclick="predictRating()"
+		>
+			Predict Rating
+		</button>`;
+	}
 	userTableBodyElement.innerHTML = "";
 	for (user of users) {
 		userTableBodyElement.innerHTML += `
