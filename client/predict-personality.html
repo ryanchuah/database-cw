@@ -4,7 +4,7 @@
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<!-- <link rel="stylesheet" href="index.css" /> -->
-		<title>Predict Ratings</title>
+		<title>Predict Personality</title>
 
 		<!-- Bootstrap CSS -->
 		<link
@@ -17,54 +17,93 @@
 	</head>
 	<body>
 		<div id="navbar"></div>
-		<form id="add-tags" class="my-5">
-			<div class="row">
-				<div class="col">
-					<label for="tag">Tag</label>
-					<input
-						type="text"
-						class="form-control"
-						placeholder="Funny"
-						name="tag"
-					/>
-				</div>
+		<div style="width: 80vw" class="mx-auto mt-3">
+			<h1>Predict Personality</h1>
+			<h6>Predict the personality of a user who uses certain tags</h6>
+			<div class="my-5 mx-auto" style="width: 40vw">
+				<form id="add-tags">
+					<div class="row">
+						<div class="col">
+							<label for="tag">Tag</label>
+							<input
+								type="text"
+								class="form-control"
+								placeholder="Funny"
+								name="tag"
+							/>
+						</div>
 
+						<div class="col">
+							<label>&nbsp;</label>
+							<button
+								type="submit"
+								class="btn btn-primary btn-block"
+								style="width: 50%"
+							>
+								Add Tag
+							</button>
+						</div>
+					</div>
+				</form>
+			</div>
+
+			<h5>Inputted tags will be shown here:</h5>
+			<table class="table mb-5">
+				<thead>
+					<tr>
+						<th scope="col">Tags</th>
+						<th scope="col">Remove</th>
+					</tr>
+				</thead>
+
+				<tbody id="tagsTableBody"></tbody>
+			</table>
+
+			<div class="d-flex">
 				<button
-					type="submit"
-					class="btn btn-primary btn-block mx-auto"
-					style="width: 10%; margin: 0 30px"
+					type="button"
+					class="btn btn-outline-danger btn-block mx-5"
+					onclick="clearTags()"
 				>
-					Add Tag
+					Clear
+				</button>
+				<button
+					type="button"
+					class="btn btn-primary btn-block mx-5"
+					onclick="predictPersonality()"
+				>
+					Predict Personality
 				</button>
 			</div>
-		</form>
 
-		<table class="table mb-5">
-			<thead>
-				<tr>
-					<th scope="col">Tags</th>
-				</tr>
-			</thead>
-
-			<tbody id="tagsTableBody"></tbody>
-		</table>
-
-		<button
-			type="button"
-			class="btn btn-primary btn-block mx-5"
-			onclick="predictPersonality()"
-		>
-			Predict Personality
-		</button>
-
-		<p id="predicted-personality">
-			<b>Predicted personality:</b
-			><span style="color: gray"
-				>The predicted personality will be shown here</span
-			>
-		</p>
+			<h5 class="mt-5">Predicted personality:</h5>
+			<div class="d-flex">
+				<div id="predicted-personality">
+					<p style="color: gray">
+						The predicted personality breakdown will be shown here
+					</p>
+				</div>
+				<!-- <p id="predicted-personality">
+						<b>Predicted personality:</b
+						><span style="color: gray"
+							>The predicted personality will be shown here</span
+						>
+					</p> -->
+				<div
+					class="canvas-container"
+					style="width: 400px; height: 400px"
+				>
+					<canvas
+						id="personality-radar"
+						width="100"
+						height="100"
+					></canvas>
+				</div>
+			</div>
+		</div>
 
 		<script src="predict-personalities.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
 		<script src="navbar.js"></script>
 
 		<!-- Bootstrap Bundle with Popper -->

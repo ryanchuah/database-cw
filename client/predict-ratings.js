@@ -18,15 +18,58 @@ function titleCase(str) {
 	return str.join(" ");
 }
 
+function isUnique(userId, users) {
+	for (usr of users) {
+		if (user.userId == userId) {
+			return false;
+		}
+	}
+	return true;
+}
+
 function addUser(event) {
 	event.preventDefault();
+	const users = JSON.parse(window.localStorage.getItem("users"));
+	console.log(users);
+
+	let isValid = true;
+	const userIdInvalid = document.getElementById("user-id-invalid");
+	const ratingInvalid = document.getElementById("rating-invalid");
+	const tagsInvalid = document.getElementById("tags-invalid");
+
 	const userId = event.target.elements.userId.value;
 	const rating = event.target.elements.rating.value;
 	var tags = event.target.elements.tags.value;
 	const tagSplit = tags.split(",").map((item) => titleCase(item.trim()));
 
-	const users = JSON.parse(window.localStorage.getItem("users"));
+	console.log(tagSplit);
+	console.log(tagSplit == true);
+	if (!userId) {
+		isValid = false;
+		userIdInvalid.innerHTML = `<p style="color: red">Required field</p>`;
+	} else if (!parseInt(userId) || userId.includes(".")) {
+		isValid = false;
+		userIdInvalid.innerHTML = `<p style="color: red">User ID must be an integer</p>`;
+	} else if (!isUnique(userId, users)) {
+		isValid = false;
+		userIdInvalid.innerHTML = `<p style="color: red">User IDs must be unique</p>`;
+	} else {
+		userIdInvalid.innerHTML = "";
+	}
 
+	if (!rating && !tags) {
+		isValid = false;
+		ratingInvalid.innerHTML = `<p style="color: red">Rating and tags cannot both be empty</p>`;
+		tagsInvalid.innerHTML = `<p style="color: red">Rating and tags cannot both be empty</p>`;
+	} else if (!parseFloat(rating)) {
+		isValid = false;
+		ratingInvalid.innerHTML = `<p style="color: red">Rating must be a number</p>`;
+	} else {
+		ratingInvalid.innerHTML = "";
+		tagsInvalid.innerHTML = "";
+	}
+
+	if (!isValid) return;
 	users.push({ userId, rating, tags: tagSplit });
 	window.localStorage.setItem("users", JSON.stringify(users));
 	updateTable(users);
@@ -38,6 +81,11 @@ function removeUser(userId) {
 	users = users.filter((user) => user.userId != userId);
 	window.localStorage.setItem("users", JSON.stringify(users));
 	updateTable(users);
+}
+
+function clearUsers() {
+	window.localStorage.setItem("users", JSON.stringify([]));
+	updateTable([]);
 }
 
 function updateTable(users) {
@@ -56,8 +104,8 @@ function updateTable(users) {
 	if (3 - users.length == 0) {
 		userTableBodyElement.innerHTML += `
         <tr style="color: gray" class="placeholder">
-            <td>1234-5678-1234</td>
-            <td>4</td>
+            <td>1234</td>
+            <td>4.3</td>
             <td>Funny, witty, exciting</td>
             <td><span style="color: gray;">&#10007;</span></td>
         </tr>`;
@@ -65,8 +113,8 @@ function updateTable(users) {
 		for (var i = 0; i < 3 - users.length; i++) {
 			userTableBodyElement.innerHTML += `
             <tr style="color: gray" class="placeholder">
-                <td>1234-5678-1234</td>
-                <td>4</td>
+                <td>1234</td>
+                <td>4.3</td>
                 <td>Funny, witty, exciting</td>
                 <td><span style="color: gray;">&#10007;</span></td>
             </tr>`;
@@ -104,8 +152,6 @@ async function predictRating() {
 		predictedRatingElement.innerHTML = `
         <b>Predicted rating:</b>
         ${Math.round(predictedRating * 100) / 100}/5`;
-
-		// console.log("1999");
 	}
 }
 

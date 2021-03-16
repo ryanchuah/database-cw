@@ -52,6 +52,7 @@ function removeTag(tagId) {
 }
 
 function updateTable(tags) {
+	const exampleTags = ["Funny", "Witty", "Prison"];
 	tagsTableBodyElement.innerHTML = "";
 	for (t of tags) {
 		tagsTableBodyElement.innerHTML += `
@@ -64,14 +65,14 @@ function updateTable(tags) {
 	if (3 - tags.length == 0) {
 		tagsTableBodyElement.innerHTML += `
         <tr style="color: gray" class="placeholder">
-            <td>Funny, witty, exciting</td>
+            <td>Funny</td>
             <td><span style="color: gray;">&#10007;</span></td>
         </tr>`;
 	} else {
 		for (var i = 0; i < 3 - tags.length; i++) {
 			tagsTableBodyElement.innerHTML += `
             <tr style="color: gray" class="placeholder">
-                <td>Funny, witty, exciting</td>
+                <td>${exampleTags[i]}</td>
                 <td><span style="color: gray;">&#10007;</span></td>
             </tr>`;
 		}
@@ -113,13 +114,16 @@ async function predictRating() {
 	}
 }
 
+function clearTags() {
+	window.localStorage.setItem("tags", JSON.stringify([]));
+	updateTable([]);
+}
+
 async function predictPersonality() {
 	const tags = JSON.parse(window.localStorage.getItem("tags"));
 
 	const url = `${rootUrl}/predict_personality`;
 	console.log(url);
-
-	console.log(JSON.stringify({ tags }));
 
 	const response = await fetch(url, {
 		method: "POST",
@@ -140,8 +144,13 @@ async function predictPersonality() {
 		console.log(data);
 
 		const predictedPersonality = data.personality[0];
-		console.log(predictedPersonality);
-		console.log(predictedPersonality.agreeableness);
+
+		if (!predictedPersonality.agreeableness) {
+			predictedPersonalityElement.innerHTML =
+				"<p>Unfortunately, we do not have a personality analysis of the tags that you have inputted. Try using more common tags</p>";
+			return;
+		}
+
 		predictedPersonalityElement.innerHTML = `
         <b>Predicted agreeableness: </b>
         ${predictedPersonality.agreeableness}<br/>
@@ -154,7 +163,40 @@ async function predictPersonality() {
         <b>Predicted openness: </b>
         ${predictedPersonality.openness}<br/>
         `;
+		personalityRadar(predictedPersonality);
 
 		// console.log("1999");
 	}
+}
+
+function personalityRadar(personality) {
+	var ctx = document.getElementById("personality-radar").getContext("2d");
+
+	new Chart(ctx, {
+		type: "radar",
+		data: {
+			labels: Object.keys(personality),
+			datasets: [
+				{
+					label: "Predicted personality",
+					backgroundColor: "rgba(3, 207, 252, 0.5)",
+					borderColor: "rgba(3, 207, 252, 1)",
+					data: Object.values(personality),
+				},
+			],
+		},
+		options: {
+			legend: {
+				labels: {
+					// This more specific font property overrides the global property
+					fontSize: 15,
+				},
+			},
+			scale: {
+				angleLines: {
+					display: false,
+				},
+			},
+		},
+	});
 }
