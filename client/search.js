@@ -37,19 +37,12 @@ async function updateDisplay(
 	page,
 	searchTerm,
 	ascending,
-	searchHeader,
-	enableAscDesc
+	searchHeader
 ) {
 	// most calls to updateDisplay will be through updatePage()
 	// updatePage() handles sets sortByValue and limit to non-null/non-undefined values, so
 	// sortByValue and limit will never be undefined
 	searchHeaderElement.innerHTML = `<h1>${searchHeader}</h1>`;
-
-	if (enableAscDesc) {
-		ascendingElement.disabled = false;
-	} else {
-		ascendingElement.disabled = true;
-	}
 
 	// clear moviesTableBody
 	moviesTableBody.innerHTML = "";
@@ -229,19 +222,13 @@ function updatePage(sortByValue, limit, page, searchTerm, ascending) {
 
 	console.log(sortByValue);
 
-	let enableAscDesc = true;
-	if (sortByValue == "movieId") {
-		enableAscDesc = false;
-	}
-
 	updateDisplay(
 		sortByValue,
 		limit,
 		page,
 		searchTerm,
 		ascending,
-		searchHeader,
-		enableAscDesc
+		searchHeader
 	);
 	updatePagination(page);
 }
