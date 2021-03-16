@@ -154,7 +154,42 @@ async function predictPersonality() {
         <b>Predicted openness: </b>
         ${predictedPersonality.openness}<br/>
         `;
+		personalityRadar(predictedPersonality);
 
 		// console.log("1999");
 	}
+}
+
+function personalityRadar(personality) {
+	var ctx = document.getElementById("personality-radar").getContext("2d");
+	console.log(Object.keys(personality));
+	console.log(Object.values(personality));
+
+	new Chart(ctx, {
+		type: "radar",
+		data: {
+			labels: Object.keys(personality),
+			datasets: [
+				{
+					label: "Predicted personality",
+					backgroundColor: "rgba(3, 207, 252, 0.5)",
+					borderColor: "rgba(3, 207, 252, 1)",
+					data: Object.values(personality),
+				},
+			],
+		},
+		options: {
+			legend: {
+				labels: {
+					// This more specific font property overrides the global property
+					fontSize: 15,
+				},
+			},
+			scale: {
+				angleLines: {
+					display: false,
+				},
+			},
+		},
+	});
 }
