@@ -65,6 +65,9 @@ async function updateDisplay() {
 
 		console.log(data);
 
+		const tagString = data.tags
+			.map((tagItem) => titleCase(tagItem.tag))
+			.join(", ");
 		let percentage;
 		for (var i = 0; i < data.similar_genres_by_genre.length; i++) {
 			currGenre = data.similar_genres_by_genre[i];
@@ -73,10 +76,18 @@ async function updateDisplay() {
 
 			percentage = Math.round(percentage * 100);
 
+			if (i == 0) {
+				breakdownByGenres.innerHTML += `<p>For example, <b style="font-size: larger">${percentage}%</b> of users who like <b style="font-size: larger">${data.genres.join(
+					", "
+				)}</b> also like <b style="font-size: larger">${
+					currGenre.genre
+				}</b></p>`;
+			}
+
 			breakdownByGenres.innerHTML += `
 			<div class="d-flex justify-content-between">
-				<p>${currGenre.genre}</p>
-				<p>${percentage}%</p>
+			<p>${currGenre.genre}</p>
+			<p>${percentage}%</p>
 			</div>`;
 			if (i == 5) {
 				break;
@@ -89,6 +100,10 @@ async function updateDisplay() {
 			percentage = parseFloat(currGenre.proportion);
 
 			percentage = Math.round(percentage * 100);
+
+			if (i == 0) {
+				breakdownByTags.innerHTML += `<p>For example, <b style="font-size: larger">${percentage}%</b> of users who liked this movie and used the tags <b style="font-size: larger">${tagString}</b> also like <b style="font-size: larger">${currGenre.genre}</b></p>`;
+			}
 
 			breakdownByTags.innerHTML += `
 			<div class="d-flex justify-content-between">
@@ -112,9 +127,8 @@ async function updateDisplay() {
 		rating.innerHTML = `<p><b>Average rating: </b>${rating_val}/5</p>`;
 
 		actors.innerHTML = `<p><b>Actors: </b>${lst_actors.join(", ")}</p>`;
-		tags.innerHTML = `<p><b>Most common tags: </b>${data.tags
-			.map((tagItem) => titleCase(tagItem.tag))
-			.join(", ")}</p>`;
+
+		tags.innerHTML = `<p><b>Most common tags: </b>${tagString}</p>`;
 
 		chartRatingsOverTime(data.ratings_date);
 		chartRatingsPie(data.ratings_date);
