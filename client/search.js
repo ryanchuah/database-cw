@@ -86,7 +86,7 @@ async function updateDisplay(
 			tr.innerHTML = `
 			<td>${movie.movieId}</td>
 			<td><a href="movies/movie.html?movieId=${movie.movieId}">${movie.title}</a></td>
-			<td>${movie.release_year}</td>
+			<td>${movie.release_year != -1 ? movie.release_year : "Unknown"}</td>
 			<td>${rating_val}</td>
 			<td>${movie.votes}</td>
 			<td>${polarity_index}</td>

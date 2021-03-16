@@ -120,7 +120,11 @@ async function updateDisplay() {
 		poster.innerHTML = `<img src="https://image.tmdb.org/t/p/w500${data.details[0].poster_url}" id="poster" onerror="javascript:this.src='images/unavailable.png'"/>`;
 		title.innerHTML = `<h1>${data.details[0].title}</h1>`;
 		genres.innerHTML = `<p><b>Genres: </b>${data.genres.join(", ")}</p>`;
-		year.innerHTML = `<p><b>Release year: </b>${data.details[0].release_year}</p>`;
+		year.innerHTML = `<p><b>Release year: </b>${
+			data.details[0].release_year != -1
+				? data.details[0].release_year
+				: "Unknown"
+		}</p>`;
 
 		var rating_val = parseFloat(data.details[0].avg_rating);
 		rating_val = rating_val ? Math.round(rating_val * 2) / 2 : "Unknown"; //round to nearest 0.5
