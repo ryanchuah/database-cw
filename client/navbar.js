@@ -8,7 +8,6 @@ if (document.getElementById("navbar")) {
 	navbar = document.getElementById("navbar-movie");
 	root = "..";
 }
-console.log(window.location.pathname);
 
 navbar.innerHTML = `
 <nav class="navbar navbar-expand-lg navbar-light bg-light">

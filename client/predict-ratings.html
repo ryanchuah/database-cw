@@ -17,16 +17,16 @@
 	</head>
 	<body>
 		<div id="navbar"></div>
-		<form id="add-user" class="my-5">
+		<form id="add-user" class="my-5" novalidate>
 			<div class="row">
 				<div class="col">
 					<label for="user-id">User ID</label>
 					<input
-						type="text"
 						class="form-control"
 						placeholder="1234-5678-1234"
 						name="userId"
 					/>
+					<div id="user-id-invalid"></div>
 				</div>
 				<div class="col">
 					<label for="rating">Rating (out of 5)</label>
@@ -36,6 +36,7 @@
 						placeholder="4"
 						name="rating"
 					/>
+					<div id="rating-invalid"></div>
 				</div>
 				<div class="col">
 					<label for="tags">Tags</label>
@@ -45,6 +46,7 @@
 						placeholder="Funny, witty, exciting"
 						name="tags"
 					/>
+					<div id="tags-invalid"></div>
 				</div>
 				<button
 					type="submit"
@@ -82,6 +84,38 @@
 				>The predicted rating will be shown here</span
 			>
 		</p>
+		<script>
+			(function () {
+				"use strict";
+				window.addEventListener(
+					"load",
+					function () {
+						// Fetch all the forms we want to apply custom Bootstrap validation styles to
+						var forms = document.getElementsByClassName(
+							"needs-validation"
+						);
+						// Loop over them and prevent submission
+						var validation = Array.prototype.filter.call(
+							forms,
+							function (form) {
+								form.addEventListener(
+									"submit",
+									function (event) {
+										if (form.checkValidity() === false) {
+											event.preventDefault();
+											event.stopPropagation();
+										}
+										form.classList.add("was-validated");
+									},
+									false
+								);
+							}
+						);
+					},
+					false
+				);
+			})();
+		</script>
 
 		<script src="predict-ratings.js"></script>
 		<script src="navbar.js"></script>
