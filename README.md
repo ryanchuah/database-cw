@@ -4,10 +4,10 @@
 ## To run:
 1. In your terminal, navigate to root directory then do  
 ```
-$ docker-compose up --build --scale server=n where n is the number of instances 
+$ docker-compose up --build --scale server=n where n is the number of instances n=2 sufficient for a demo
 ```
-2. To test the server and database, enter `http://localhost/` into your browser. You should see an object of `favorite_colors`  
-3. To test the client, open index.html in your browser. You should see a list of users and their colors.  
+2. To test the server and database, enter `http://localhost/movies/1` into your browser.
+3. To test the client, open index.html in your browser.  
 
 ## To stop:
 1. In another terminal, navigate to root directory then do 
