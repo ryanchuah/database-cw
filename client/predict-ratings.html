@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<!-- <link rel="stylesheet" href="index.css" /> -->
 		<title>Predict Ratings</title>
 
 		<!-- Bootstrap CSS -->
@@ -17,73 +16,89 @@
 	</head>
 	<body>
 		<div id="navbar"></div>
-		<form id="add-user" class="my-5" novalidate>
-			<div class="row">
-				<div class="col">
-					<label for="user-id">User ID</label>
-					<input
-						class="form-control"
-						placeholder="1234-5678-1234"
-						name="userId"
-					/>
-					<div id="user-id-invalid"></div>
+		<div style="width: 80vw" class="mx-auto mt-3">
+			<h1>Predict Rating</h1>
+			<h6>Predict the rating of a soon-to-be-released movie</h6>
+			<form
+				id="add-user"
+				class="my-5 mx-auto"
+				style="width: 80vw"
+				novalidate
+			>
+				<div class="row">
+					<div class="col">
+						<label for="user-id">User ID</label>
+						<input
+							class="form-control"
+							placeholder="1234-5678-1234"
+							name="userId"
+						/>
+						<div id="user-id-invalid"></div>
+					</div>
+					<div class="col">
+						<label for="rating">Rating (out of 5)</label>
+						<input
+							type="text"
+							class="form-control"
+							placeholder="4"
+							name="rating"
+						/>
+						<div id="rating-invalid"></div>
+					</div>
+					<div class="col">
+						<label for="tags">Tags</label>
+						<input
+							type="text"
+							class="form-control"
+							placeholder="Funny, witty, exciting"
+							name="tags"
+						/>
+						<div id="tags-invalid"></div>
+					</div>
+
+					<button type="submit" class="btn btn-primary">
+						Add User
+					</button>
 				</div>
-				<div class="col">
-					<label for="rating">Rating (out of 5)</label>
-					<input
-						type="text"
-						class="form-control"
-						placeholder="4"
-						name="rating"
-					/>
-					<div id="rating-invalid"></div>
-				</div>
-				<div class="col">
-					<label for="tags">Tags</label>
-					<input
-						type="text"
-						class="form-control"
-						placeholder="Funny, witty, exciting"
-						name="tags"
-					/>
-					<div id="tags-invalid"></div>
-				</div>
+			</form>
+
+			<h5>Inputted users will be shown here:</h5>
+			<table class="table mx-auto" style="width: 80vw">
+				<thead>
+					<tr>
+						<th scope="col">UserId</th>
+						<th scope="col">Rating</th>
+						<th scope="col">Tags</th>
+						<th scope="col">Remove</th>
+					</tr>
+				</thead>
+				<tbody id="userTableBody"></tbody>
+			</table>
+
+			<div class="d-flex">
 				<button
-					type="submit"
-					class="btn btn-primary btn-block mx-auto"
-					style="width: 10%; margin: 0 30px"
+					type="button"
+					class="btn btn-outline-danger btn-block mx-5"
+					onclick="clearUsers()"
 				>
-					Add User
+					Clear
+				</button>
+				<button
+					type="button"
+					class="btn btn-primary btn-block mx-5"
+					onclick="predictRating()"
+				>
+					Predict Rating
 				</button>
 			</div>
-		</form>
 
-		<table class="table mb-5">
-			<thead>
-				<tr>
-					<th scope="col">UserId</th>
-					<th scope="col">Rating</th>
-					<th scope="col">Tags</th>
-					<th scope="col">Remove</th>
-				</tr>
-			</thead>
-			<tbody id="userTableBody"></tbody>
-		</table>
-
-		<button
-			type="button"
-			class="btn btn-primary btn-block mx-5"
-			onclick="predictRating()"
-		>
-			Predict Rating
-		</button>
-
-		<p id="predicted-rating">
-			<b>Predicted rating:</b
-			><span style="color: gray"
-				>The predicted rating will be shown here</span
-			>
-		</p>
+			<h5 class="mt-5">Predicted rating:</h5>
+			<div id="predicted-rating" class="mb-5">
+				<p style="color: gray">
+					The predicted rating will be shown here
+				</p>
+			</div>
+		</div>
 		<script>
 			(function () {
 				"use strict";

@@ -37,12 +37,20 @@ async function updateDisplay(
 	page,
 	searchTerm,
 	ascending,
-	searchHeader
+	searchHeader,
+	enableAscDesc
 ) {
 	// most calls to updateDisplay will be through updatePage()
 	// updatePage() handles sets sortByValue and limit to non-null/non-undefined values, so
 	// sortByValue and limit will never be undefined
 	searchHeaderElement.innerHTML = `<h1>${searchHeader}</h1>`;
+
+	if (enableAscDesc) {
+		ascendingElement.disabled = false;
+	} else {
+		ascendingElement.disabled = true;
+	}
+
 	// clear moviesTableBody
 	moviesTableBody.innerHTML = "";
 
@@ -71,11 +79,16 @@ async function updateDisplay(
 	} else {
 		const data = await response.json();
 		let rating_val;
+		let polarity_index;
 		for (const movie of data.movies) {
 			let tr = document.createElement("tr");
 			rating_val = parseFloat(movie.avg_ratings);
 			rating_val = rating_val
-				? Math.round(rating_val * 2) / 2
+				? Math.round(rating_val * 100) / 100
+				: "Unknown"; //round to nearest 0.5
+			polarity_index = parseFloat(movie.polarity_index);
+			polarity_index = polarity_index
+				? Math.round(polarity_index * 100) / 100
 				: "Unknown"; //round to nearest 0.5
 			tr.innerHTML = `
 			<td>${movie.movieId}</td>
@@ -83,6 +96,7 @@ async function updateDisplay(
 			<td>${movie.release_year}</td>
 			<td>${rating_val}</td>
 			<td>${movie.votes}</td>
+			<td>${polarity_index}</td>
 			`;
 			moviesTableBody.appendChild(tr);
 		}
@@ -139,6 +153,7 @@ function updatePagination(page) {
 function updatePage(sortByValue, limit, page, searchTerm, ascending) {
 	// if sortByValue is null, then we check if it is stored in localStorage
 	// if it is not stored in localStorage, we use the value "default"
+
 	if (!sortByValue) {
 		sortByValue = window.localStorage.getItem("search-sortByValue")
 			? JSON.parse(window.localStorage.getItem("search-sortByValue"))
@@ -207,7 +222,17 @@ function updatePage(sortByValue, limit, page, searchTerm, ascending) {
 			JSON.stringify(ascending)
 		);
 	}
-	// console.log(page);
+	// update "selected" attribute in sortBy HTML element
+	document.querySelector(
+		'#ascending [value="' + ascending + '"]'
+	).selected = true;
+
+	console.log(sortByValue);
+
+	let enableAscDesc = true;
+	if (sortByValue == "movieId") {
+		enableAscDesc = false;
+	}
 
 	updateDisplay(
 		sortByValue,
@@ -215,7 +240,8 @@ function updatePage(sortByValue, limit, page, searchTerm, ascending) {
 		page,
 		searchTerm,
 		ascending,
-		searchHeader
+		searchHeader,
+		enableAscDesc
 	);
 	updatePagination(page);
 }

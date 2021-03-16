@@ -18,42 +18,46 @@
 	</head>
 	<body>
 		<div id="navbar-movie"></div>
-		<div class="d-flex p-2">
-			<div class="p-2" id="poster"></div>
-			<div class="d-flex flex-column p-5 justify-content-center">
-				<div class="p-2" id="title"></div>
-				<div class="p-2" id="genres"></div>
-				<div class="p-2" id="year"></div>
-				<div class="p-2" id="rating"></div>
-				<div class="p-2" id="actors"></div>
-				<div class="p-2" id="tags"></div>
-			</div>
-		</div>
 
-		<div class="d-flex p-5 justify-content-around">
-			<div class="canvas-container">
-				<canvas
-					id="ratings-over-time"
-					width="100"
-					height="100"
-				></canvas>
+		<div style="width: 80vw" class="mx-auto mt-3">
+			<div class="d-flex p-2">
+				<div class="p-2" id="poster"></div>
+				<div class="d-flex flex-column p-5 justify-content-center">
+					<div class="p-2" id="title"></div>
+					<div class="p-2" id="genres"></div>
+					<div class="p-2" id="year"></div>
+					<div class="p-2" id="rating"></div>
+					<div class="p-2" id="actors"></div>
+					<div class="p-2" id="tags"></div>
+				</div>
 			</div>
 
-			<div class="canvas-container">
-				<canvas id="ratings-pie" width="100" height="100"></canvas>
-			</div>
-		</div>
+			<div class="d-flex p-5 justify-content-around">
+				<div class="canvas-container">
+					<canvas
+						id="ratings-over-time"
+						width="100"
+						height="100"
+					></canvas>
+				</div>
 
-		<h3>Users may also like:</h3>
-		<div class="d-flex p-5 justify-content-around">
-			<div class="user-breakdown">
-				<h4>Based on genres:</h4>
-				<div id="breakdown-genres"></div>
+				<div class="canvas-container">
+					<canvas id="ratings-pie" width="100" height="100"></canvas>
+				</div>
 			</div>
 
-			<div class="user-breakdown">
-				<h4>Based on tags:</h4>
-				<div id="breakdown-tags"></div>
+			<h3 style="text-align: center">Users may also like:</h3>
+			<div class="d-flex p-5 justify-content-around">
+				<div class="user-breakdown">
+					<h4>Based on genres:</h4>
+					<p></p>
+					<div id="breakdown-genres"></div>
+				</div>
+
+				<div class="user-breakdown">
+					<h4>Based on tags:</h4>
+					<div id="breakdown-tags"></div>
+				</div>
 			</div>
 		</div>
 

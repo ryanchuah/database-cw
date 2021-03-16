@@ -83,6 +83,11 @@ function removeUser(userId) {
 	updateTable(users);
 }
 
+function clearUsers() {
+	window.localStorage.setItem("users", JSON.stringify([]));
+	updateTable([]);
+}
+
 function updateTable(users) {
 	userTableBodyElement.innerHTML = "";
 	for (user of users) {

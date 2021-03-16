@@ -25,12 +25,16 @@ function updateTables(data, elem) {
 	for (const movie of data.movies) {
 		let tr = document.createElement("tr");
 		let rating_val = parseFloat(movie.avg_ratings);
-		rating_val = rating_val ? Math.round(rating_val * 2) / 2 : "Unknown"; //round to nearest 0.5
-
 		let polarity_index = parseFloat(movie.polarity_index);
+
+		rating_val = parseFloat(movie.avg_ratings);
+		rating_val = rating_val
+			? Math.round(rating_val * 100) / 100
+			: "Unknown"; //round to nearest 0.5
+		polarity_index = parseFloat(movie.polarity_index);
 		polarity_index = polarity_index
-			? Math.round(polarity_index * 2) / 2
-			: "Unknown";
+			? Math.round(polarity_index * 100) / 100
+			: "Unknown"; //round to nearest 0.5
 		tr.innerHTML = `
 			<td>${movie.movieId}</td>
 			<td><a href="movies/movie.html?movieId=${movie.movieId}">${movie.title}</a></td>
