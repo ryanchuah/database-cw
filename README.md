@@ -62,7 +62,9 @@ Above is the entity relationship diagram for our system. As you can see it consi
         - The size of the preview panel isn't constant.
      
 #### 6. Predicting the personality traits of viewers who will give a high rating to a soon-to-be-released film (using the personality/ratings dataset from GroupLens) whose tags are known.
-    This use-case made use of the personality traits dataset from GroupLens. The query gets all movieIds from the original dataset that have the same tags as the soon-to-be released movie. From the personality dataset. we filter out users that have rated these movies less than 4.5 and average the personality traits of the remaining users.
+    This use-case made use of the personality traits dataset from GroupLens. The query gets all movieIds from the original 
+    dataset that have the same tags as the soon-to-be released movie. From the personality dataset. we filter out users 
+    that have rated these movies less than 4.5 and average the personality traits of the remaining users.
 
 
 ## Additional Features:
@@ -70,23 +72,35 @@ Above is the entity relationship diagram for our system. As you can see it consi
 We also implemented a load balancer using Nginx to optimise resource utilisation, maximise throughput, and reduce latency across the multiple application instances. We implemented load balancing using round robin distribution due to its simplicity. It receives client requests and distributes them across servers in a repeated pattern, e.g. server A, server B, server C, server A etc. This ont only improves user experience but allows for the system to be scaled up and handle more requests and data in the future.  
 
 ### TMDB API
+The TMDB API was used to find out additional information about the movies including actors and the movie posters.
+We selectively chose information from the API which would be useful to the marketing professionals.
 
 ### Caching  
 We also implemented caching of query results. By caching the results of a query the first time it is requested, it means that if it is asked for again, the results of that query can be returned to the user very quickly. This is due to no calculation or processing needing to be carried out since the results are still available from the first query. This reduces latency and improves the performance of the system.
 
 ## Assumptions
+For use case 5 we made the presumption that the movie we are predicting the rating for is not already in the database 
+and therefore the information for this use case is being collected at the front end. The user will enter the user ids, 
+ratings and/or tags for each user from the preview panel and a predicted rating for the new movie will be generated. 
+We tested our solution by manually entering the data from a randomly chosen subset of users from the database that watched 
+a specific movie to ensure that our predictions were accurate.
 
 
 ## Sample Request:
 ### Use case 1 & 3:
-    (movies page URL)
+http://localhost:63342/database-cw/client/search.html
 
-### Use case 2:
+### Use case 2 & 4:
+http://localhost:63342/database-cw/client/movies/movie.html?movieId=318
 
+### Use case 5:
+http://localhost:63342/database-cw/client/predict-ratings.html#
 
+### Use case 6:
+http://localhost:63342/database-cw/client/predict-personality.html
 
-
-
+### Index page:
+http://localhost:63342/database-cw/client/index.html
 
 
 

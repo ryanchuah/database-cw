@@ -72,7 +72,7 @@ def search_movies():
     return {"movies": query(command, holders, get_sorted_result)}
 
 
-# Use case 2: Searching for a film to obtain a report on viewer react ion to it
+# Use case 2: Searching for a film to obtain a report on viewer reaction to it
 # Use case 4: Segmenting the audience for a released movie)
 @app.route('/movies/<movie_id>')
 @cache.cached(timeout=3600)
@@ -91,11 +91,11 @@ def single_movie(movie_id):
                         FROM Actors, Actor_Roles
                         WHERE Actors.actorId = Actor_Roles.actorId AND Actor_Roles.movieId = %s'''
 
-    tags_command = '''SELECT tag, COUNT(tag) AS occurence
+    tags_command = '''SELECT tag, COUNT(tag) AS occurrence
                       FROM Tags
                       WHERE Tags.movieId = %s
                       GROUP BY tag
-                      ORDER BY occurence DESC 
+                      ORDER BY occurrence DESC 
                       LIMIT 3
                       '''
 
@@ -105,7 +105,7 @@ def single_movie(movie_id):
                       ORDER BY timestamp ASC
                       '''
 
-    ratings_percentage_command = '''SELECT rating, COUNT(rating) AS occurence
+    ratings_percentage_command = '''SELECT rating, COUNT(rating) AS occurrence
                       FROM Ratings
                       WHERE Ratings.movieId = %s
                       GROUP BY rating
@@ -130,21 +130,14 @@ def single_movie(movie_id):
 # Use case 5: Predicting the likely viewer ratings for a soon-to-be-released film based on the tags and or ratings for
 # the film provided by a preview panel of viewers drawn from the population of viewers in the database.
 @app.route("/predict_rating", methods=['POST'])
-# @cache.cached(timeout=3600, query_string=True)
 @cross_origin()
 def predict_ratings():
-    # get tags from front end
-    # responses = tuple(request.args.getlist('responses'))
-    # userId = request.args.get('userId')
-    # tags = tuple(request.args.getlist('tags'))
-    # rating = request.args.get('rating')
     responses = []
     for user in request.get_json()['users']:
-        print(user)
         rating = 0
         tags = ()
         try:
-            rating = float(user['rating'].split('/')[0])  # TODO: remove later
+            rating = float(user['rating'].split('/')[0])
         except:
             rating = 0
         try:
@@ -152,10 +145,7 @@ def predict_ratings():
         except:
             tags = ()
 
-        responses.append([user['userId'], tuple(user['tags']), rating])
-
-    # responses = [[userId, tags, rating]]
-    print(responses)
+        responses.append([user['userId'], tags, rating])
 
     tag_sum = 0
     rating_sum = 0
@@ -166,6 +156,8 @@ def predict_ratings():
     average_rating = 0
 
     for response in responses:
+        print("RESPONSEE")
+        print (response)
         userId = response[0]
         tags = response[1]
         rating = response[2]
@@ -220,34 +212,20 @@ def predict_ratings():
 
     return {'predicted_rating': average_rating}
 
+
 # Use Case 6: Predicting the personality traits of viewers who will give a high rating to a soon-to-be-released film
 # whose tags are known.
-
-
 @app.route("/predict_personality", methods=['GET', 'POST'])
-# @cache.cached(timeout=3600, query_string=True)
 @cross_origin()
 def predict_personality():
     tags = []
-    # print()
-    # print()
-    print(request.get_json())
-    # tags = [t['tag'] for t in request.get_json()]
     for t in request.get_json()['tags']:
         print(t)
         tags.append(t['tag'])
-    # return {}
-    # # print(request.get_json()['users'])
 
-    print()
-    print()
-    print()
-    print(tags)
-    # tags = tuple(['Funny', 'Funny', 'Funny'])
-
-    # tags = tuple(request.args.getlist('tags'))
     condition = create_condition(tags, col='Tags.tag')
-    command = f'''SELECT avg(openness) as avg_openness, avg(agreeableness) as avg_agreeableness, avg(emotional_stability) as avg_emotional_stability, avg(conscientiousness) as conscientiousness, avg(extraversion) as extraversion
+    command = f'''SELECT avg(openness) as avg_openness, avg(agreeableness) as avg_agreeableness, avg(emotional_stability) as avg_emotional_stability, 
+    avg(conscientiousness) as conscientiousness, avg(extraversion) as extraversion
                     FROM Personality_Attributes_table
                     INNER JOIN Personality_Ratings_table ON Personality_Attributes_table.hashed_userId = Personality_Ratings_table.hashed_userId
                     INNER JOIN (SELECT movieId FROM Tags WHERE {condition}) as temp ON temp.movieId = Personality_Ratings_table.movieId
