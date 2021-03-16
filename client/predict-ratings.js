@@ -64,7 +64,7 @@ function addUser(event) {
 	} else if (!parseFloat(rating)) {
 		isValid = false;
 		ratingInvalid.innerHTML = `<p style="color: red">Rating must be a number</p>`;
-	} else if (parseFloat(rating) > 5) {
+	} else if (parseFloat(rating) > 5 || parseFloat(rating) < 0) {
 		isValid = false;
 		ratingInvalid.innerHTML = `<p style="color: red">Rating must be between 0 and 5</p>`;
 	} else {
