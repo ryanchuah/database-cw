@@ -195,15 +195,15 @@ def predict_ratings():
         count += 1
         total_sum += float(rating)
 
-    if tag_sum != 0 and rating_sum != 0:
+    if tag_count > 0 and rating_count > 0:
         average_rating = ((tag_sum/tag_count) + (rating_sum / rating_count) + (total_sum/count)) / 3
-    elif tag_sum != 0:
-        average_rating = ((tag_sum/tag_count) + (total_sum/rating_count)) / 2
-    elif rating_sum != 0:
-        average_rating = ((rating_sum/tag_count) + (total_sum/rating_count)) / 2
+    elif tag_count > 0:
+        average_rating = ((tag_sum/tag_count) + (total_sum/count)) / 2
+    elif rating_count > 0:
+        average_rating = ((rating_sum/rating_count) + (total_sum/count)) / 2
     else:
         try:
-            average_rating = total_sum/count
+            average_rating = total_sum / count
         except:
             average_rating = 0
 
