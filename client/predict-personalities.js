@@ -80,40 +80,6 @@ function updateTable(tags) {
 }
 updateTable(JSON.parse(window.localStorage.getItem("tags")));
 
-async function predictRating() {
-	const tags = JSON.parse(window.localStorage.getItem("tags"));
-
-	const url = `${rootUrl}/predict_personality`;
-	console.log(url);
-
-	console.log(JSON.stringify({ tags }));
-
-	const response = await fetch(url, {
-		method: "POST",
-		headers: {
-			"Content-Type": "application/json",
-		},
-		body: JSON.stringify({ tags }),
-	});
-
-	if (!response.ok) {
-		// TODO: graceful handling
-		console.error(
-			"Error response from server. Error code: ",
-			response.status
-		);
-	} else {
-		const data = await response.json();
-		const predictedRating = data.predicted_rating;
-		console.log(predictedRating);
-		predictedRatingElement.innerHTML = `
-        <b>Predicted rating:</b>
-        ${Math.round(predictedRating * 100) / 100}/5`;
-
-		// console.log("1999");
-	}
-}
-
 function clearTags() {
 	window.localStorage.setItem("tags", JSON.stringify([]));
 	updateTable([]);
@@ -124,6 +90,7 @@ async function predictPersonality() {
 
 	const url = `${rootUrl}/predict_personality`;
 	console.log(url);
+	console.log(JSON.stringify({ tags }));
 
 	const response = await fetch(url, {
 		method: "POST",

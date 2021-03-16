@@ -88,19 +88,46 @@ a specific movie to ensure that our predictions were accurate.
 
 ## Sample Request:
 ### Use case 1 & 3:
-http://localhost/movies/1
+[GET] http://localhost/movies/1
 
 ### Use case 2:
-http://localhost/search?sortBy=release_year&limit=10&page=1&ascending=0&search_criteria=Toy
+[GET] http://localhost/search?sortBy=release_year&limit=10&page=1&ascending=0&search_criteria=Toy
 
 ### Use case 4:
-http://localhost/movies?sortBy=popularity&limit=10&page=1&ascending=1
+[GET] http://localhost/movies?sortBy=popularity&limit=10&page=1&ascending=1
 
 ### Use case 5:
-http://localhost/predict_ratings
+[POST] http://localhost/predict_rating
+```
+headers: {"Content-Type": "application/json",}
+body: {
+    "users":[
+        {
+            "userId":"1",
+            "rating":"4",
+            "tags":["Funny"]
+        },
+        {
+            "userId":"2",
+            "rating":"3",
+            "tags":["Witty","Exciting"]
+        }
+    ]
+}
+```
 
 ### Use case 6:
-http://localhost/predict_personality
+[POST] http://localhost/predict_personality  
+Example:
+```
+headers: {"Content-Type": "application/json",}
+body: {
+    "tags":[
+        {"uid":14,"tag":"violent"},
+        {"uid":15,"tag":"gory"}
+    ]
+}
+```
 
 
 ## Viewing console output from index.js

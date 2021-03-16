@@ -154,39 +154,3 @@ async function predictRating() {
         ${Math.round(predictedRating * 100) / 100}/5`;
 	}
 }
-
-async function predictPersonality() {
-	const users = JSON.parse(window.localStorage.getItem("users"));
-
-	const url = `${rootUrl}/predict_personality`;
-	console.log(url);
-
-	console.log(JSON.stringify({ users }));
-
-	const response = await fetch(url, {
-		method: "POST",
-		headers: {
-			"Content-Type": "application/json",
-		},
-		body: JSON.stringify({ users }),
-	});
-
-	if (!response.ok) {
-		// TODO: graceful handling
-		console.error(
-			"Error response from server. Error code: ",
-			response.status
-		);
-	} else {
-		const data = await response.json();
-		console.log(data);
-
-		const predictedRating = data.predicted_rating;
-		console.log(predictedRating);
-		predictedRatingElement.innerHTML = `
-        <b>Predicted rating:</b>
-        ${Math.round(predictedRating * 100) / 100}/5`;
-
-		// console.log("1999");
-	}
-}
