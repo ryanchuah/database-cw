@@ -23,7 +23,6 @@ services:
       MYSQL_PASSWORD: user
       MYSQL_DATABASE: movies_db
       MYSQL_ROOT_PASSWORD: root
-    # command: ["--secure-file-priv=${PWD}"]
     volumes:
       - ./db:/docker-entrypoint-initdb.d/:ro
       - ./db:/app
